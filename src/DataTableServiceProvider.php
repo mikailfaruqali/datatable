@@ -3,6 +3,7 @@
 namespace Snawbar\DataTable;
 
 use Illuminate\Support\ServiceProvider;
+use Snawbar\DataTable\Console\MakeDataTableCommand;
 
 class DataTableServiceProvider extends ServiceProvider
 {
@@ -13,7 +14,13 @@ class DataTableServiceProvider extends ServiceProvider
 
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__ . '/../config/datatable.php', 'snawbar-datatable');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'snawbar-datatable');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'snawbar-datatable');
+
+        $this->commands([
+            MakeDataTableCommand::class,
+        ]);
     }
 
     private function publishAssets()
@@ -21,11 +28,9 @@ class DataTableServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/datatable.php' => config_path('snawbar-datatable.php'),
-            ], 'snawbar-datatable-config');
-
-            $this->publishes([
                 __DIR__ . '/../resources/lang' => resource_path('lang/vendor/snawbar-datatable'),
-            ], 'snawbar-datatable-lang');
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/snawbar-datatable'),
+            ], 'snawbar-datatable-assets');
         }
     }
 }

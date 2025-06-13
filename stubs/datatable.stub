@@ -1,0 +1,45 @@
+<?php
+
+namespace DummyNamespace;
+
+use Snawbar\DataTable\DataTable;
+use Illuminate\Http\Request;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
+
+class DummyClass extends DataTable
+{
+    protected function query(Request $request): Builder
+    {
+        return DB::table('users')->select('id', 'name', 'email');
+    }
+
+    public function columns(): array
+    {
+        return [
+            ['data' => 'id', 'title' => 'ID'],
+            ['data' => 'name', 'title' => 'Name'],
+            ['data' => 'email', 'title' => 'Email'],
+        ];
+    }
+
+    public function tableId(): string
+    {
+        return 'users-table';
+    }
+
+    public function tableClass(): ?string
+    {
+        return '';
+    }
+
+    public function isOrderable(): bool
+    {
+        return true;
+    }
+
+    public function length(): int
+    {
+        return 10;
+    }
+}

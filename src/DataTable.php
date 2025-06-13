@@ -115,7 +115,7 @@ abstract class DataTable
 
     private function renderHtml()
     {
-        return view('datatable::table', [
+        return view('snawbar-datatable::table-builder', [
             'tableId' => $this->tableId(),
             'tableClass' => $this->tableClass(),
             'isOrderable' => $this->isOrderable(),
