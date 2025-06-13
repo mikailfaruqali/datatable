@@ -26,4 +26,16 @@ return [
     */
 
     'default-length' => 10,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Orderable Columns
+    |--------------------------------------------------------------------------
+    |
+    | This setting controls the default orderability of DataTable columns.
+    | You may override it per-column by adding 'orderable' => false in the column config.
+    |
+    */
+
+    'orderable' => FALSE,
 ];

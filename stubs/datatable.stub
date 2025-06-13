@@ -36,18 +36,28 @@ class DummyClass extends DataTable
         return 'users-table';
     }
 
+    public function filterContainer(): ?string
+    {
+        return NULL;
+    }
+
     public function tableClass(): ?string
     {
-        return '';
+        return NULL;
     }
 
     public function isOrderable(): bool
     {
-        return true;
+        return TRUE;
     }
 
     public function length(): int
     {
         return 10;
+    }
+
+    public function shouldJumpToLastPage(): bool
+    {
+        return FALSE;
     }
 }

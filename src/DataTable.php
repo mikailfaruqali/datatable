@@ -44,12 +44,22 @@ abstract class DataTable
         return NULL;
     }
 
-    public function length(): int
+    public function filterContainer(): ?string
     {
-        return config()->int('snawbar-datatable.default-length');
+        return NULL;
     }
 
     public function isOrderable(): bool
+    {
+        return config('snawbar-datatable.orderable');
+    }
+
+    public function length(): int
+    {
+        return config('snawbar-datatable.default-length');
+    }
+
+    public function shouldJumpToLastPage(): bool
     {
         return FALSE;
     }
@@ -113,7 +123,9 @@ abstract class DataTable
     public function render($view)
     {
         return $this->request->ajax() ? $this->make() : view($view, [
-            'datatable' => $this->renderHtml(),
+            'dtHtml' => $this->renderHtml(),
+            'dtJs' => $this->renderJs(),
+            'dtId' => $this->tableId(),
         ]);
     }
 
@@ -122,8 +134,20 @@ abstract class DataTable
         return view('snawbar-datatable::table-builder', [
             'tableId' => $this->tableId(),
             'tableClass' => $this->tableClass(),
+            'tableRedrawFunction' => $this->tableRedrawFunction(),
+            'filterContainer' => $this->filterContainer(),
+        ])->render();
+    }
+
+    private function renderJs()
+    {
+        return view('snawbar-datatable::table-js', [
+            'tableId' => $this->tableId(),
+            'jsSafeTableId' => $this->jsSafeTableId(),
+            'tableRedrawFunction' => $this->tableRedrawFunction(),
             'isOrderable' => $this->isOrderable(),
             'length' => $this->length(),
+            'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
             'columns' => $this->columns(),
             'ajaxUrl' => $this->request->fullUrl(),
         ])->render();
@@ -161,5 +185,15 @@ abstract class DataTable
             ->fromSub($this->builder, 'totals')
             ->selectRaw('count(*) as total_records')
             ->value('total_records');
+    }
+
+    private function tableRedrawFunction()
+    {
+        return sprintf('%s_redraw', $this->jsSafeTableId());
+    }
+
+    private function jsSafeTableId()
+    {
+        return str_replace('-', '_', $this->tableId());
     }
 }
