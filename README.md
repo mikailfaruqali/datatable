@@ -43,9 +43,11 @@ The generated class will extend the base `Snawbar\DataTable\DataTable` and inclu
 - `columns(): array`
 - `setupColumns(): void`
 - `tableId(): string`
+- `filterContainer(): string`
 - `tableClass(): ?string`
 - `isOrderable(): bool`
 - `length(): int`
+- `shouldJumpToLastPage(): int`
 
 
 ## Requirements
