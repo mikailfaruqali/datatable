@@ -2,7 +2,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const {{ $jsSafeTableId }} =  $('#{{ $tableId }}').DataTable({
+    $('#{{ $tableId }}').DataTable({
         deferRender: true,
         serverSide: true,
         stateSave: true,
@@ -49,9 +49,13 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         columns: @json($columns)
     });
-
-    function {{ $tableRedrawFunction }}() {
-        {{ $jsSafeTableId }}.ajax.reload(null, false);
-    }
 });
+
+function {{ $tableRedrawFunction }}() {
+    clearTimeout({{ $tableRedrawFunction }}TimeoutId);
+    
+    {{ $tableRedrawFunction }}TimeoutId = setTimeout(() => {
+        $('#{{ jsSafeTableId }}').DataTable().draw();
+    }, 100);
+}
 </script>

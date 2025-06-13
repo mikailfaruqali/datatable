@@ -176,7 +176,7 @@ abstract class DataTable
 
     private function tableRedrawFunction()
     {
-        return sprintf('%s_redraw', $this->jsSafeTableId());
+        return sprintf('%s_redraw()', $this->jsSafeTableId());
     }
 
     private function jsSafeTableId()
