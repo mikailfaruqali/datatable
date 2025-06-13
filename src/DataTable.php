@@ -17,8 +17,6 @@ abstract class DataTable
 
     private array $additionalData = [];
 
-    private bool $iteration = FALSE;
-
     private Builder $builder;
 
     public function __construct(Request $request)
@@ -94,9 +92,7 @@ abstract class DataTable
 
     public function iteration()
     {
-        $this->iteration = TRUE;
-
-        return $this;
+        return FALSE;
     }
 
     public function withData($data)
@@ -161,7 +157,7 @@ abstract class DataTable
         $rows = $this->builder->skip($start)->take($length)->get();
 
         $rows->each(function ($row, $index) use ($start) {
-            if ($this->iteration) {
+            if ($this->iteration()) {
                 $row->iteration = $start + $index + 1;
             }
 
