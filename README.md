@@ -41,19 +41,11 @@ The generated class will extend the base `Snawbar\DataTable\DataTable` and inclu
 
 - `query(Request $request): Builder`
 - `columns(): array`
+- `setupColumns(): void`
 - `tableId(): string`
-- `tableClass(): string|null`
+- `tableClass(): ?string`
 - `isOrderable(): bool`
 - `length(): int`
-
-You can optionally define a `boot()` method to add or edit columns programmatically:
-
-```
-protected function boot(): void
-{
-    $this->addColumn('action', fn($row) => view('components.action-buttons', ['id' => $row->id]));
-}
-```
 
 
 ## Requirements
