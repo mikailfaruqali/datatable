@@ -1,13 +1,13 @@
 {
-    "name": "mikailfaruqali/databale",
+    "name": "mikailfaruqali/datatabale",
     "description": "A Laravel package to build server-side DataTable with custom column builders and easy frontend integration.",
     "keywords": [
         "laravel",
-        "databales",
+        "datatabales",
         "database",
         "snawbar"
     ],
-    "homepage": "https://github.com/mikailfaruqali/databale",
+    "homepage": "https://github.com/mikailfaruqali/datatabale",
     "license": "MIT",
     "authors": [
         {
