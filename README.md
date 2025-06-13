@@ -1,8 +1,8 @@
-# Laravel DataTable Builder Package
+# Snawbar DataTable
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-A Laravel package to build server-side DataTables with custom column builders and easy frontend integration.
+A Laravel package to build server-side DataTable with custom column builders and easy frontend integration.
 
 ## Installation
 

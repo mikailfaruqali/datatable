@@ -11,12 +11,21 @@ class DataTableServiceProvider extends ServiceProvider
         $this->publishAssets();
     }
 
+    public function register()
+    {
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'snawbar-datatable');
+    }
+
     private function publishAssets()
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/datatables.php' => config_path('snawbar-datatables.php'),
-            ], 'snawbar-datatables-config');
+                __DIR__ . '/../config/datatable.php' => config_path('snawbar-datatable.php'),
+            ], 'snawbar-datatable-config');
+
+            $this->publishes([
+                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/snawbar-datatable'),
+            ], 'snawbar-datatable-lang');
         }
     }
 }

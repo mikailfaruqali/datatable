@@ -1,6 +1,6 @@
 {
     "name": "mikailfaruqali/databales",
-    "description": "A Laravel package to build server-side DataTables with custom column builders and easy frontend integration.",
+    "description": "A Laravel package to build server-side DataTable with custom column builders and easy frontend integration.",
     "keywords": [
         "laravel",
         "databales",
@@ -28,7 +28,10 @@
     "autoload": {
         "psr-4": {
             "Snawbar\\DataTable\\": "src/"
-        }
+        },
+        "files": [
+            "src/Helpers/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {
