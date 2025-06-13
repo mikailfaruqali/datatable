@@ -119,33 +119,24 @@ abstract class DataTable
     public function render($view)
     {
         return $this->request->ajax() ? $this->make() : view($view, [
-            'dtHtml' => $this->renderHtml(),
-            'dtJs' => $this->renderJs(),
-            'dtId' => $this->tableId(),
+            'tableRedrawFunction' => $this->tableRedrawFunction(),
+            'datatable' => $this->renderTable(),
         ]);
     }
 
-    private function renderHtml()
+    private function renderTable()
     {
         return view('snawbar-datatable::table-builder', [
             'tableId' => $this->tableId(),
             'tableClass' => $this->tableClass(),
-            'tableRedrawFunction' => $this->tableRedrawFunction(),
-            'filterContainer' => $this->filterContainer(),
-        ])->render();
-    }
-
-    private function renderJs()
-    {
-        return view('snawbar-datatable::table-js', [
-            'tableId' => $this->tableId(),
             'jsSafeTableId' => $this->jsSafeTableId(),
-            'tableRedrawFunction' => $this->tableRedrawFunction(),
             'isOrderable' => $this->isOrderable(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
             'columns' => $this->columns(),
             'ajaxUrl' => $this->request->fullUrl(),
+            'tableRedrawFunction' => $this->tableRedrawFunction(),
+            'filterContainer' => $this->filterContainer(),
         ])->render();
     }
 
