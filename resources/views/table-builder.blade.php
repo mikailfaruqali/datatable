@@ -1,4 +1,4 @@
-<table id="{{ $tableId }}" class="{{ config()->string('snawbar-datatable.table-class') }} {{ $tableClass }}"></table>
+<table id="{{ $tableId }}" class="{{ config('snawbar-datatable.table-style') }} {{ $tableClass }}"></table>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

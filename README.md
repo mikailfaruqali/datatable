@@ -18,6 +18,44 @@ Publish the config (if applicable) or just use the package classes in your Larav
 php artisan vendor:publish --provider="Snawbar\DataTable\DataTableServiceProvider" --tag="config"
 ```
 
+## 🛠 Create a DataTable Class
+
+This package provides an Artisan command to generate a new DataTable class quickly.
+
+### 📦 Command
+
+```
+php artisan make:datatable UserDatatable
+```
+
+This will generate a new file at:
+
+```
+app/DataTables/ProductCategoryDatatable.php
+```
+
+
+### 📁 Stub Example
+
+The generated class will extend the base `Snawbar\DataTable\DataTable` and include the required methods like:
+
+- `query(Request $request): Builder`
+- `columns(): array`
+- `tableId(): string`
+- `tableClass(): string|null`
+- `isOrderable(): bool`
+- `length(): int`
+
+You can optionally define a `boot()` method to add or edit columns programmatically:
+
+```
+protected function boot(): void
+{
+    $this->addColumn('action', fn($row) => view('components.action-buttons', ['id' => $row->id]));
+}
+```
+
+
 ## Requirements
 
 - PHP >= 7.4  

@@ -24,18 +24,24 @@ abstract class DataTable
     public function __construct(Request $request)
     {
         $this->builder = $this->query($request);
+
         $this->request = $request;
+
+        $this->setupColumns();
     }
 
     abstract protected function query(Request $request): Builder;
 
     abstract public function columns(): array;
 
-    abstract public function tableClass(): ?string;
-
     public function tableId(): string
     {
         return 'datatable';
+    }
+
+    public function tableClass(): ?string
+    {
+        return NULL;
     }
 
     public function length(): int
@@ -74,6 +80,8 @@ abstract class DataTable
         return $this;
     }
 
+    public function setupColumns(): void {}
+
     public function iteration()
     {
         $this->iteration = TRUE;
@@ -102,15 +110,11 @@ abstract class DataTable
         ], $this->additionalData));
     }
 
-    public function render()
+    public function render($view)
     {
-        if ($this->request->ajax()) {
-            return $this->make();
-        }
-
-        return [
-            'html' => $this->renderHtml(),
-        ];
+        return $this->request->ajax() ? $this->make() : view($view, [
+            'datatable' => $this->renderHtml(),
+        ]);
     }
 
     private function renderHtml()

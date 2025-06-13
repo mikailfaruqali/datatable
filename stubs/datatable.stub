@@ -20,7 +20,15 @@ class DummyClass extends DataTable
             ['data' => 'id', 'title' => 'ID'],
             ['data' => 'name', 'title' => 'Name'],
             ['data' => 'email', 'title' => 'Email'],
+            ['data' => 'action', 'title' => 'action'],
         ];
+    }
+
+    public function setupColumns(): void 
+    {
+        $this->addColumn('action', function ($row) {
+            
+        });
     }
 
     public function tableId(): string
