@@ -52,10 +52,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function {{ $tableRedrawFunction }}() {
-    clearTimeout({{ $tableRedrawFunction }}TimeoutId);
-    
-    {{ $tableRedrawFunction }}TimeoutId = setTimeout(() => {
-        $('#{{ jsSafeTableId }}').DataTable().draw();
-    }, 100);
+    $('#{{ $tableId }}').DataTable().draw();
 }
 </script>

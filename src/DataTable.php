@@ -119,8 +119,9 @@ abstract class DataTable
     public function render($view)
     {
         return $this->request->ajax() ? $this->make() : view($view, [
-            'tableRedrawFunction' => $this->tableRedrawFunction(),
+            'tableRedraw' => $this->tableRedrawFunctionString(),
             'datatable' => $this->renderTable(),
+            'tableId' => $this->tableId(),
         ]);
     }
 
@@ -129,7 +130,6 @@ abstract class DataTable
         return view('snawbar-datatable::table-builder', [
             'tableId' => $this->tableId(),
             'tableClass' => $this->tableClass(),
-            'jsSafeTableId' => $this->jsSafeTableId(),
             'isOrderable' => $this->isOrderable(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
@@ -174,9 +174,14 @@ abstract class DataTable
             ->value('total_records');
     }
 
+    private function tableRedrawFunctionString()
+    {
+        return sprintf('%s()', $this->tableRedrawFunction());
+    }
+
     private function tableRedrawFunction()
     {
-        return sprintf('%s_redraw()', $this->jsSafeTableId());
+        return sprintf('%s_redraw', $this->jsSafeTableId());
     }
 
     private function jsSafeTableId()
