@@ -59,7 +59,7 @@ abstract class DataTable
 
     public function length(): int
     {
-        return config('snawbar-datatable.default-length');
+        return FALSE;
     }
 
     public function shouldJumpToLastPage(): bool
