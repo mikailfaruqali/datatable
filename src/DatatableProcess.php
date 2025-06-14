@@ -29,24 +29,19 @@ class DatatableProcess
     private function handleAjax()
     {
         return collect($this->tables)
-            ->first(fn ($t) => $t->jsSafeTableId() === request('table_id'))
-            ?->ajax()
-            ?? abort(404, 'Unknown datatable requested');
+            ->first(fn ($table) => $table->jsSafeTableId() === request('table_id'))
+            ?->ajax();
     }
 
     private function renderView(?string $view = NULL)
     {
-        $tablesHtml = $this->renderTables();
-
-        return is_null($view) ? $tablesHtml : view($view, [
-            'datatables' => $tablesHtml,
-        ]);
+        return is_null($view) ? $this->renderTables() : view($view, $this->renderTables());
     }
 
     private function renderTables()
     {
         return collect($this->tables)->mapWithKeys(fn ($table) => [
-            $table->jsSafeTableId() => [
+            $table->jsSafeTableId() => (object) [
                 'tableRedraw' => $table->tableRedrawFunctionString(),
                 'datatable' => $table->html(),
                 'tableId' => $table->tableId(),
