@@ -9,7 +9,7 @@
     <style>
         @font-face {
             font-family: font;
-            src: url("{{ config('snawbar-datatable.font') }}")
+            src: url("{{ asset_or_url(config('snawbar-datatable.font')) }}")
         }
 
         * {
