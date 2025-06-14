@@ -85,11 +85,15 @@ function {{ $jsSafeTableId }}_getTableCurrentUrl(extra = {}) {
     return `${table.ajax.url()}?${$.param(Object.assign({}, table.ajax.params(), extra))}`;
 }
 
-$(document).on('click', '{{ $printButtonSelector }}', function(e) {
-    window.open({{ $jsSafeTableId }}_getTableCurrentUrl({print: 1}), '_blank', 'width=4000,height=4000');
-});
+@if($printButtonSelector)
+    $(document).on('click', '{{ $printButtonSelector }}', function(e) {
+        window.open({{ $jsSafeTableId }}_getTableCurrentUrl({print: 1}), '_blank', 'width=4000,height=4000');
+    });
+@endif
 
-$(document).on('click', '{{ $excelButtonSelector }}', function(e) {
-    {{ $jsSafeTableId }}_downloadFile({{ $jsSafeTableId }}_getTableCurrentUrl({excel: 1}), '{{ $exportTitle }}');
-});
+@if($excelButtonSelector)
+    $(document).on('click', '{{ $excelButtonSelector }}', function(e) {
+        {{ $jsSafeTableId }}_downloadFile({{ $jsSafeTableId }}_getTableCurrentUrl({excel: 1}), '{{ $exportTitle }}');
+    });
+@endif
 </script>
