@@ -14,61 +14,63 @@
 
         * {
             font-family: font;
-            color: black !important
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-family: Arial, sans-serif;
+            text-align: center;
+            font-family: font;
             font-size: 14px;
         }
 
-        thead {
-            background-color: #343a40;
-            color: white;
+        table.table-bordered {
+            border: 1px solid #181c32 !important
         }
 
-        thead th {
-            padding: 10px;
+        table.table-bordered>thead>tr>th {
+            border: 1px solid #181c32 !important;
+            font-size: 15px;
+            font-weight: bold;
+            text-overflow: ellipsis;
+            color: black !important
+        }
+
+        table.table-bordered>tbody>tr>td {
+            border: 1px solid #181c32 !important;
+            font-size: 15px;
+            text-overflow: ellipsis;
+            color: black !important
+        }
+
+        table.table-bordered>tfoot>tr>td {
+            border: 1px solid #181c32 !important;
+            font-size: 15px;
+            text-overflow: ellipsis;
+            color: black !important
+        }
+
+        .fieldset-top-border {
+            border-bottom: none;
+            border-right: none;
+            border-left: none;
+            border-top: 1px solid;
+        }
+
+        .fieldset-top-border legend {
+            width: auto;
             text-align: center;
-            border: 1px solid #dee2e6;
-        }
-
-        tbody td {
-            padding: 10px;
-            border: 1px solid #dee2e6;
-            text-align: center;
-        }
-
-        tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        tbody tr:hover {
-            background-color: #e9ecef;
-        }
-
-        .table_caption caption {
-            caption-side: top !important;
-            border: 1px solid #181c32;
-            border-bottom: none !important;
-            font-style: normal !important
-        }
-
-        .table_caption caption h1 {
-            text-align: center !important;
-            font-size: 25px !important;
-            font-weight: 800
+            font-size: 1.1em;
+            font-weight: bolder;
         }
     </style>
 </head>
 
 <body>
+    <fieldset class="fieldset-top-border">
+        <legend>{{ $title }}</legend>
+    </fieldset>
     <table class="table table-bordered table-striped table-hover table_caption">
-        <caption>
-            <h1>{{ $title }}</h1>
-        </caption>
         <thead class="thead-dark">
             <tr>
                 @foreach ($headers as $header)
