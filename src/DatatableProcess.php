@@ -29,7 +29,7 @@ class DatatableProcess
     private function handleAjax()
     {
         return collect($this->tables)
-            ->first(fn ($table) => $table->jsSafeTableId() === request('table_id'))
+            ->first(fn ($table) => $table->jsSafeTableId() === request('tableId'))
             ?->ajax();
     }
 

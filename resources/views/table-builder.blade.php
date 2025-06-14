@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', function () {
         ajax: {
             url: "{{ $ajaxUrl }}",
             data: function(data) {
+                data.tableId = "{{ $jsSafeTableId }}";
+                
 				$({{ $filterContainer }}).find('input, select, textarea').each(function () {
                     data[$(this).attr('name')] = $(this).val();
                 });

@@ -120,6 +120,7 @@ abstract class DataTable
     {
         return view('snawbar-datatable::table-builder', [
             'tableId' => $this->tableId(),
+            'jsSafeTableId' => $this->jsSafeTableId(),
             'tableClass' => $this->tableClass(),
             'isOrderable' => $this->isOrderable(),
             'length' => $this->length(),
