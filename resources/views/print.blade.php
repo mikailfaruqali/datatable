@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ session()->get('direction', 'ltr') }}">
 
 <head>
     <meta charset="UTF-8">
@@ -7,6 +7,16 @@
     <title>{{ $title }}</title>
 
     <style>
+        @font-face {
+            font-family: font;
+            src: url("{{ config('snawbar-datatable.font') }}")
+        }
+
+        * {
+            font-family: font;
+            color: black !important
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -38,11 +48,27 @@
         tbody tr:hover {
             background-color: #e9ecef;
         }
+
+        .table_caption caption {
+            caption-side: top !important;
+            border: 1px solid #181c32;
+            border-bottom: none !important;
+            font-style: normal !important
+        }
+
+        .table_caption caption h1 {
+            text-align: center !important;
+            font-size: 25px !important;
+            font-weight: 800
+        }
     </style>
 </head>
 
 <body>
-    <table class="table table-bordered table-striped table-hover">
+    <table class="table table-bordered table-striped table-hover table_caption">
+        <caption>
+            <h1>{{ $title }}</h1>
+        </caption>
         <thead class="thead-dark">
             <tr>
                 @foreach ($headers as $header)
