@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data: function(data) {
                 data.tableId = "{{ $jsSafeTableId }}";
                 
-				$({{ $filterContainer }}).find('input, select, textarea').each(function () {
+				$('{{ $filterContainer }}').find('input, select, textarea').each(function () {
                     data[$(this).attr('name')] = $(this).val();
                 });
 			},
