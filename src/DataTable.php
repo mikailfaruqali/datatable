@@ -102,7 +102,7 @@ abstract class DataTable
         return $this;
     }
 
-    public function make()
+    public function ajax()
     {
         $totalRecords = $this->totalRecords();
 
@@ -116,16 +116,7 @@ abstract class DataTable
         ], $this->additionalData));
     }
 
-    public function render($view)
-    {
-        return $this->request->ajax() ? $this->make() : view($view, [
-            'tableRedraw' => $this->tableRedrawFunctionString(),
-            'datatable' => $this->renderTable(),
-            'tableId' => $this->tableId(),
-        ]);
-    }
-
-    private function renderTable()
+    public function html()
     {
         return view('snawbar-datatable::table-builder', [
             'tableId' => $this->tableId(),
@@ -138,6 +129,16 @@ abstract class DataTable
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'filterContainer' => $this->filterContainer(),
         ])->render();
+    }
+
+    public function tableRedrawFunctionString()
+    {
+        return sprintf('%s()', $this->tableRedrawFunction());
+    }
+
+    public function jsSafeTableId()
+    {
+        return str_replace('-', '_', $this->tableId());
     }
 
     private function prepareRows()
@@ -174,18 +175,8 @@ abstract class DataTable
             ->value('total_records');
     }
 
-    private function tableRedrawFunctionString()
-    {
-        return sprintf('%s()', $this->tableRedrawFunction());
-    }
-
     private function tableRedrawFunction()
     {
         return sprintf('%s_redraw', $this->jsSafeTableId());
-    }
-
-    private function jsSafeTableId()
-    {
-        return str_replace('-', '_', $this->tableId());
     }
 }

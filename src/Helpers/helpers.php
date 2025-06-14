@@ -1,8 +1,8 @@
 <?php
 
-use Snawbar\DataTable\DataTable;
+use Snawbar\DataTable\DatatableProcess;
 
-function datatable($query)
+function datatableProcess(array $datatables): DatatableProcess
 {
-    return new DataTable($query);
+    return new DatatableProcess($datatables);
 }
