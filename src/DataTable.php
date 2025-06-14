@@ -49,7 +49,7 @@ abstract class DataTable
 
     public function isOrderable(): bool
     {
-        return config('snawbar-datatable.orderable');
+        return FALSE;
     }
 
     public function defaultOrderBy(): ?string
