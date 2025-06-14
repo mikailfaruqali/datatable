@@ -67,6 +67,21 @@ abstract class DataTable
         return FALSE;
     }
 
+    public function printButtonSelector(): ?string
+    {
+        return NULL;
+    }
+
+    public function excelButtonSelector(): ?string
+    {
+        return NULL;
+    }
+
+    public function exportTitle(): ?string
+    {
+        return NULL;
+    }
+
     public function editColumn(string $column, callable $callback, ?callable $condition = NULL)
     {
         $this->editColumns[$column] = function ($row) use ($callback, $condition) {
@@ -134,6 +149,9 @@ abstract class DataTable
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'filterContainer' => $this->filterContainer(),
+            'printButtonSelector' => $this->printButtonSelector(),
+            'excelButtonSelector' => $this->excelButtonSelector(),
+            'exportTitle' => $this->exportTitle(),
         ])->render();
     }
 
@@ -153,8 +171,7 @@ abstract class DataTable
         $length = request()->input('length', 10);
 
         $rows = $this->builder
-            ->skip($start)
-            ->take($length)
+            ->when($this->request->ajax(), fn ($query) => $query->skip($start)->take($length))
             ->when($this->isOrderable(), fn ($query) => $query->orderByRaw($this->buildSortClause()))
             ->get();
 

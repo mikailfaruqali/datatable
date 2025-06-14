@@ -30,7 +30,7 @@ class DummyClass extends DataTable
 
     public function tableId(): string
     {
-        return 'users-table';
+        return 'datatables';
     }
 
     public function iteration(): int
@@ -66,5 +66,20 @@ class DummyClass extends DataTable
     public function shouldJumpToLastPage(): bool
     {
         return FALSE;
+    }
+
+    public function printButtonSelector(): ?string
+    {
+        return NULL;
+    }
+
+    public function excelButtonSelector(): ?string
+    {
+        return NULL;
+    }
+
+    public function exportTitle(): ?string
+    {
+        return NULL;
     }
 }

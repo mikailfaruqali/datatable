@@ -2,23 +2,31 @@
 
 namespace Snawbar\DataTable;
 
+use Exception;
+use Maatwebsite\Excel\Facades\Excel;
+use Snawbar\DataTable\Export\Exportable;
+
 class DatatableProcess
 {
     private array $tables = [];
 
-    public function __construct(array $datatableClassesOrInstances)
+    public function __construct($datatableClassesOrInstances)
     {
         $this->initializeTables($datatableClassesOrInstances);
     }
 
     public function render(?string $view = NULL)
     {
-        return request()->ajax() ? $this->handleAjax() : $this->renderView($view);
+        if (request()->ajax() || request()->hasAny(['print', 'excel'])) {
+            return $this->handleAjax();
+        }
+
+        return $this->renderView($view);
     }
 
-    private function initializeTables(array $datatables): void
+    private function initializeTables($datatables): void
     {
-        $this->tables = array_map(fn ($dt) => $this->resolveDatatable($dt, request()), $datatables);
+        $this->tables = array_map(fn ($datatable) => $this->resolveDatatable($datatable, request()), is_array($datatables) ? $datatables : [$datatables]);
     }
 
     private function resolveDatatable(mixed $datatable, $request): object
@@ -28,9 +36,23 @@ class DatatableProcess
 
     private function handleAjax()
     {
-        return collect($this->tables)
-            ->first(fn ($table) => $table->jsSafeTableId() === request('tableId'))
-            ?->ajax();
+        $datatable = collect($this->tables)->first(fn ($table) => $table->jsSafeTableId() === request('tableId'));
+
+        if (request()->ajax()) {
+            return $datatable->ajax();
+        }
+
+        throw_if(blank($datatable->exportTitle()), new Exception('Export title is not set for the datatable'));
+
+        if (request()->has('print')) {
+            return $this->handlePrintPage($datatable);
+        }
+
+        if (request()->has('excel')) {
+            return $this->handleExcelExport($datatable);
+        }
+
+        return NULL;
     }
 
     private function renderView(?string $view = NULL)
@@ -47,5 +69,48 @@ class DatatableProcess
                 'tableId' => $table->tableId(),
             ],
         ]);
+    }
+
+    private function handlePrintPage($datatable)
+    {
+        $exportColumns = $this->exportColumns($datatable);
+
+        return view('snawbar-datatable::print', [
+            'rows' => $this->exportData($datatable, $exportColumns),
+            'headers' => $this->getExportHeaders($exportColumns),
+            'title' => $datatable->exportTitle(),
+        ]);
+    }
+
+    private function handleExcelExport($datatable)
+    {
+        $exportColumns = $this->exportColumns($datatable);
+
+        return Excel::download(new Exportable(
+            $this->exportData($datatable, $exportColumns),
+            $this->getExportHeaders($exportColumns),
+        ), sprintf('%s.xlsx', $datatable->exportTitle()));
+    }
+
+    private function exportData($datatable, $exportColumns = NULL)
+    {
+        return $this->mapDataKeysToTitles(collect($datatable->ajax()->getData()->data), $exportColumns);
+    }
+
+    private function exportColumns($datatable)
+    {
+        return collect($datatable->columns())
+            ->filter(fn ($column) => ($column['exportable'] ?? TRUE) && ($column['visible'] ?? TRUE))
+            ->pluck('title', 'data');
+    }
+
+    private function mapDataKeysToTitles($rows, $columns): array
+    {
+        return $rows->map(fn ($row) => $columns->mapWithKeys(fn ($title, $key) => [$title => $row->{$key}]))->toArray();
+    }
+
+    private function getExportHeaders($columns): array
+    {
+        return $columns->values()->all();
     }
 }

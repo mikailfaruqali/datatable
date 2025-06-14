@@ -56,4 +56,40 @@ document.addEventListener('DOMContentLoaded', function () {
 function {{ $tableRedrawFunction }}() {
     $('#{{ $tableId }}').DataTable().draw();
 }
+
+function {{ $jsSafeTableId }}_createAnchorElement(attributes = {}) {
+    const anchor = document.createElement('a');
+
+    Object.entries(attributes).forEach(([key, value]) =>
+        key === 'onclick' && typeof value === 'function' ?
+        (anchor.onclick = value) : anchor.setAttribute(key, value)
+    );
+
+    return anchor;
+}
+
+function {{ $jsSafeTableId }}_downloadFile(url, filename) {
+    const anchor = {{ $jsSafeTableId }}_createAnchorElement({
+        href: url,
+        download: filename,
+    });
+
+    $('body').append(anchor);
+    anchor.click();
+    $(anchor).remove();
+}
+
+function {{ $jsSafeTableId }}_getTableCurrentUrl(extra = {}) {
+    const table = $('#{{ $tableId }}').DataTable();
+
+    return `${table.ajax.url()}?${$.param(Object.assign({}, table.ajax.params(), extra))}`;
+}
+
+$(document).on('click', '{{ $printButtonSelector }}', function(e) {
+    window.open({{ $jsSafeTableId }}_getTableCurrentUrl({print: 1}), '_blank', 'width=4000,height=4000');
+});
+
+$(document).on('click', '{{ $excelButtonSelector }}', function(e) {
+    {{ $jsSafeTableId }}_downloadFile({{ $jsSafeTableId }}_getTableCurrentUrl({excel: 1}), '{{ $exportTitle }}');
+});
 </script>

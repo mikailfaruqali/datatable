@@ -2,7 +2,7 @@
 
 use Snawbar\DataTable\DatatableProcess;
 
-function datatableProcess(array $datatables): DatatableProcess
+function datatableProcess($datatables): DatatableProcess
 {
     return new DatatableProcess($datatables);
 }

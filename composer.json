@@ -18,7 +18,8 @@
     ],
     "require": {
         "php": ">=7.4",
-        "illuminate/contracts": ">=5.0"
+        "illuminate/contracts": ">=5.0",
+        "maatwebsite/excel": "*"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
