@@ -53,6 +53,11 @@ class DummyClass extends DataTable
         return false;
     }
 
+    public function defaultOrderBy(): ?string
+    {
+        return 'id';
+    }
+
     public function length(): int
     {
         return 10;

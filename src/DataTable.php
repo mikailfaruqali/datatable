@@ -52,6 +52,11 @@ abstract class DataTable
         return config('snawbar-datatable.orderable');
     }
 
+    public function defaultOrderBy(): ?string
+    {
+        return 'id';
+    }
+
     public function length(): int
     {
         return config('snawbar-datatable.default-length');
@@ -147,7 +152,11 @@ abstract class DataTable
         $start = request()->input('start', 0);
         $length = request()->input('length', 10);
 
-        $rows = $this->builder->skip($start)->take($length)->get();
+        $rows = $this->builder
+            ->skip($start)
+            ->take($length)
+            ->when($this->isOrderable(), fn ($query) => $query->orderByRaw($this->buildSortClause()))
+            ->get();
 
         $rows->each(function ($row, $index) use ($start) {
             if ($this->iteration()) {
@@ -179,5 +188,34 @@ abstract class DataTable
     private function tableRedrawFunction()
     {
         return sprintf('%s_redraw', $this->jsSafeTableId());
+    }
+
+    private function buildSortClause(): string
+    {
+        $columnIndex = $this->request->input('order.0.column', $this->request->input('sortable'));
+        $columnName = $this->extractSortColumn($this->request->columns, $this->request->column, $columnIndex);
+        $direction = mb_strtoupper($this->request->input('order.0.dir', $this->request->dir));
+
+        if ($this->shouldUseDefaultSort($columnName, $direction)) {
+            return $this->defaultOrderBy();
+        }
+
+        return sprintf('%s %s', $columnName, $direction);
+    }
+
+    private function extractSortColumn($indexedColumns, $fallbackColumns, $index): ?string
+    {
+        if ($indexedColumns) {
+            return $indexedColumns[$index]['data'] ?? NULL;
+        }
+
+        $fallback = explode(',', (string) $fallbackColumns);
+
+        return in_array($index, $fallback) ? $index : NULL;
+    }
+
+    private function shouldUseDefaultSort(?string $column, string $direction): bool
+    {
+        return blank($column) || ! in_array($direction, ['ASC', 'DESC']) || $column === 'iteration';
     }
 }
