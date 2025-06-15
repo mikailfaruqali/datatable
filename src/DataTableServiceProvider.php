@@ -1,6 +1,6 @@
 <?php
 
-namespace Snawbar\DataTable\Providers;
+namespace Snawbar\DataTable;
 
 use Illuminate\Support\ServiceProvider;
 use Snawbar\DataTable\Console\MakeDataTableCommand;
