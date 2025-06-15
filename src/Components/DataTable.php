@@ -5,6 +5,7 @@ namespace Snawbar\DataTable\Components;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 abstract class DataTable
@@ -143,7 +144,7 @@ abstract class DataTable
             'defaultOrderBy' => $this->defaultOrderBy(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
-            'columns' => $this->columns(),
+            'columns' => $this->processColumns()->all(),
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'filterContainer' => $this->filterContainer(),
@@ -161,6 +162,28 @@ abstract class DataTable
     public function jsSafeTableId()
     {
         return str_replace('-', '_', $this->tableId());
+    }
+
+    private function processColumns(): Collection
+    {
+        return collect($this->columns())
+            ->map(fn ($column) => is_array($column) ? $column : $column->toArray())
+            ->filter(fn ($column) => $this->shouldIncludeColumn($column));
+    }
+
+    private function shouldIncludeColumn($column): bool
+    {
+        if (blank($column['data'])) {
+            return FALSE;
+        }
+
+        $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
+
+        if ($evaluate($column['visible'] ?? TRUE) === FALSE) {
+            return FALSE;
+        }
+
+        return ! (request()->has(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) === FALSE);
     }
 
     private function prepareRows()

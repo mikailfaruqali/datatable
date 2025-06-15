@@ -99,8 +99,8 @@ class DatatableProcess
 
     private function exportColumns($datatable)
     {
-        return collect($datatable->columns())
-            ->filter(fn ($column) => ($column['exportable'] ?? TRUE) && ($column['visible'] ?? TRUE))
+        return $datatable->processColumns()
+            ->map(fn ($columns) => $columns + ['title' => $columns['title'] ?? $columns['data']])
             ->pluck('title', 'data');
     }
 
