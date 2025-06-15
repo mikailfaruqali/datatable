@@ -8,10 +8,15 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class Exportable implements FromArray, WithHeadings, WithMapping
 {
-    public function __construct(
-        private readonly array $data,
-        private readonly array $headers,
-    ) {}
+    private $data;
+
+    private $headers;
+
+    public function __construct(array $data, array $headers)
+    {
+        $this->data = $data;
+        $this->headers = $headers;
+    }
 
     public function array(): array
     {

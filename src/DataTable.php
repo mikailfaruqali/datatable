@@ -79,7 +79,7 @@ abstract class DataTable
         return NULL;
     }
 
-    public function editColumn(string $column, callable $callback, ?callable $condition = NULL)
+    public function editColumn($column, $callback, $condition = NULL)
     {
         $this->editColumns[$column] = function ($row) use ($callback, $condition) {
             if (is_callable($condition) && $condition($row) === FALSE) {
@@ -92,7 +92,7 @@ abstract class DataTable
         return $this;
     }
 
-    public function addColumn(string $column, callable $callback, ?callable $condition = NULL)
+    public function addColumn($column, $callback, $condition = NULL)
     {
         $this->addColumns[$column] = function ($row) use ($callback, $condition) {
             if (is_callable($condition) && $condition($row) === FALSE) {
@@ -229,7 +229,7 @@ abstract class DataTable
         return in_array($index, $fallback) ? $index : NULL;
     }
 
-    private function shouldUseDefaultSort(?string $column, string $direction): bool
+    private function shouldUseDefaultSort($column, $direction): bool
     {
         return blank($column) || ! in_array($direction, ['ASC', 'DESC']) || $column === 'iteration';
     }

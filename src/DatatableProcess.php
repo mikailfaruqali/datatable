@@ -15,7 +15,7 @@ class DatatableProcess
         $this->initializeTables($datatableClassesOrInstances);
     }
 
-    public function render(?string $view = NULL)
+    public function render($view = NULL)
     {
         if (request()->ajax() || request()->hasAny(['print', 'excel'])) {
             return $this->handleAjax();
@@ -29,7 +29,7 @@ class DatatableProcess
         $this->tables = array_map(fn ($datatable) => $this->resolveDatatable($datatable, request()), is_array($datatables) ? $datatables : [$datatables]);
     }
 
-    private function resolveDatatable(mixed $datatable, $request): object
+    private function resolveDatatable($datatable, $request): object
     {
         return is_string($datatable) && class_exists($datatable) ? new $datatable($request) : $datatable;
     }
@@ -55,7 +55,7 @@ class DatatableProcess
         return NULL;
     }
 
-    private function renderView(?string $view = NULL)
+    private function renderView($view = NULL)
     {
         return is_null($view) ? $this->renderTables() : view($view, $this->renderTables());
     }

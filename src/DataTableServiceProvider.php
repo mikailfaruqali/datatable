@@ -28,7 +28,7 @@ class DataTableServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/datatable.php' => config_path('snawbar-datatable.php'),
-                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/snawbar-datatable'),
+                __DIR__ . '/../resources/lang' => lang_path('lang/vendor/snawbar-datatable'),
                 __DIR__ . '/../resources/views' => resource_path('views/vendor/snawbar-datatable'),
             ], 'snawbar-datatable-assets');
         }
