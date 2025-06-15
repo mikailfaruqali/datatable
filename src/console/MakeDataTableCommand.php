@@ -15,6 +15,6 @@ class MakeDataTableCommand extends GeneratorCommand
 
     protected function getDefaultNamespace($rootNamespace)
     {
-        return sprintf('%s\\DataTables', $rootNamespace);
+        return sprintf('%s\\Components\\DataTables', $rootNamespace);
     }
 }

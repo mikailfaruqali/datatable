@@ -1,6 +1,6 @@
 <?php
 
-namespace Snawbar\DataTable;
+namespace Snawbar\DataTable\Services;
 
 use Exception;
 use Maatwebsite\Excel\Facades\Excel;

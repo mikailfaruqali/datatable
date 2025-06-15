@@ -1,6 +1,6 @@
 <?php
 
-use Snawbar\DataTable\DatatableProcess;
+use Snawbar\DataTable\Services\DatatableProcess;
 
 function datatableProcess($datatables): DatatableProcess
 {

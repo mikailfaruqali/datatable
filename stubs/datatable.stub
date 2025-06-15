@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Snawbar\DataTable\DataTable;
+use Snawbar\DataTable\Components\DataTable;
 use Illuminate\Http\Request;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;

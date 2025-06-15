@@ -1,6 +1,6 @@
 <?php
 
-namespace Snawbar\DataTable;
+namespace Snawbar\DataTable\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Query\Builder;
