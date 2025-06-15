@@ -81,6 +81,13 @@ class Column
         return $this;
     }
 
+    public function responsivePriority($priority): static
+    {
+        $this->attributes['responsivePriority'] = $priority;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return $this->attributes;

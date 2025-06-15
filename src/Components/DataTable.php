@@ -164,7 +164,7 @@ abstract class DataTable
         return str_replace('-', '_', $this->tableId());
     }
 
-    private function processColumns(): Collection
+    public function processColumns(): Collection
     {
         return collect($this->columns())
             ->map(fn ($column) => is_array($column) ? $column : $column->toArray())
@@ -183,7 +183,7 @@ abstract class DataTable
             return FALSE;
         }
 
-        return ! (request()->has(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) === FALSE);
+        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) === FALSE);
     }
 
     private function prepareRows()
