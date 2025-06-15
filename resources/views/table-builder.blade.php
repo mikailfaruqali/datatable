@@ -1,6 +1,8 @@
 <table id="{{ $tableId }}" class="{{ config('snawbar-datatable.table-style') }} {{ $tableClass }}"></table>
 
 <script>
+const order = {{ datatable_print_html(datatable_when($isOrderable, json_encode($defaultOrderBy), '[]')) }};
+
 document.addEventListener('DOMContentLoaded', function () {
     $('#{{ $tableId }}').DataTable({
         deferRender: true,
@@ -13,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         searching: false,
         pageLength: '{{ $length }}',
         ordering: '{{ $isOrderable }}',
-        order: '{{ $defaultOrderBy }}',
+        order: order,
         language: {
             oPaginate: {
                 sPrevious: "{{ __('snawbar-datatable::datatable.previous') }}",

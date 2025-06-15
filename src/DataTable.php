@@ -140,7 +140,7 @@ abstract class DataTable
             'jsSafeTableId' => $this->jsSafeTableId(),
             'tableClass' => $this->tableClass(),
             'isOrderable' => $this->isOrderable(),
-            'defaultOrderBy' => $this->defaultOrderByString(),
+            'defaultOrderBy' => $this->defaultOrderBy(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
             'columns' => $this->columns(),
