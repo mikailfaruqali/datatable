@@ -33,7 +33,7 @@ class DummyClass extends DataTable
         return 'datatables';
     }
 
-    public function iteration(): int
+    public function iteration(): bool
     {
         return false;
     }
