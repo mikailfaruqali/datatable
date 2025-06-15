@@ -32,10 +32,7 @@ abstract class DataTable
 
     abstract public function columns(): array;
 
-    public function tableId(): string
-    {
-        return 'datatable';
-    }
+    abstract public function tableId(): string;
 
     public function tableClass(): ?string
     {
@@ -52,14 +49,14 @@ abstract class DataTable
         return FALSE;
     }
 
-    public function defaultOrderBy(): ?string
+    public function defaultOrderBy(): array
     {
-        return 'id';
+        return [0, 'ASC'];
     }
 
     public function length(): int
     {
-        return FALSE;
+        return 10;
     }
 
     public function shouldJumpToLastPage(): bool
@@ -110,7 +107,7 @@ abstract class DataTable
 
     public function setupColumns(): void {}
 
-    public function iteration()
+    public function iteration(): bool
     {
         return FALSE;
     }
@@ -143,6 +140,7 @@ abstract class DataTable
             'jsSafeTableId' => $this->jsSafeTableId(),
             'tableClass' => $this->tableClass(),
             'isOrderable' => $this->isOrderable(),
+            'defaultOrderBy' => $this->defaultOrderByString(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
             'columns' => $this->columns(),
@@ -214,7 +212,7 @@ abstract class DataTable
         $direction = mb_strtoupper($this->request->input('order.0.dir', $this->request->dir));
 
         if ($this->shouldUseDefaultSort($columnName, $direction)) {
-            return $this->defaultOrderBy();
+            return $this->defaultOrderByString();
         }
 
         return sprintf('%s %s', $columnName, $direction);
@@ -234,5 +232,10 @@ abstract class DataTable
     private function shouldUseDefaultSort(?string $column, string $direction): bool
     {
         return blank($column) || ! in_array($direction, ['ASC', 'DESC']) || $column === 'iteration';
+    }
+
+    private function defaultOrderByString(): string
+    {
+        return implode(' ', $this->defaultOrderBy());
     }
 }

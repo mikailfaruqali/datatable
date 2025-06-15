@@ -11,8 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
         processing: true,
         bLengthChange: false,
         searching: false,
-        pageLength: "{{ $length }}",
-        ordering: "{{ $isOrderable }}",
+        pageLength: '{{ $length }}',
+        ordering: '{{ $isOrderable }}',
+        order: '{{ $defaultOrderBy }}',
         language: {
             oPaginate: {
                 sPrevious: "{{ __('snawbar-datatable::datatable.previous') }}",
@@ -40,9 +41,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         ajax: {
-            url: "{{ $ajaxUrl }}",
+            url: '{{ $ajaxUrl }}',
             data: function(data) {
-                data.tableId = "{{ $jsSafeTableId }}";
+                data.tableId = '{{ $jsSafeTableId }}';
                 
 				$('{{ $filterContainer }}').find('input, select, textarea').each(function () {
                     data[$(this).attr('name')] = $(this).val();
