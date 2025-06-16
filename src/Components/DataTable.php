@@ -118,6 +118,11 @@ abstract class DataTable
         return NULL;
     }
 
+    public function totalableContainer(): ?string
+    {
+        return NULL;
+    }
+
     public function ajax(): JsonResponse
     {
         [$totalRecords, $aggregateQuery] = $this->prepareAggregateQuery();
@@ -147,6 +152,7 @@ abstract class DataTable
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'filterContainer' => $this->filterContainer(),
+            'totalableContainer' => $this->totalableContainer(),
             'printButtonSelector' => $this->printButtonSelector(),
             'excelButtonSelector' => $this->excelButtonSelector(),
             'exportTitle' => $this->exportTitle(),
@@ -237,7 +243,6 @@ abstract class DataTable
                 return [
                     $alias => [
                         'title' => $column['title'],
-                        'selector' => $column['selector'],
                         'value' => $column['resolve']($value),
                     ],
                 ];
@@ -253,7 +258,6 @@ abstract class DataTable
             ->map(fn ($totalableColumn) => $totalableColumn instanceof SummableColumn ? $totalableColumn : SummableColumn::make($totalableColumn))
             ->filter(fn ($totalableColumn) => $this->shouldIncludeSummableColumns($totalableColumn))
             ->map(fn ($totalableColumn) => [
-                'selector' => $totalableColumn->getSelector(),
                 'title' => $totalableColumn->getTitle(),
                 'alias' => $totalableColumn->getAlias(),
                 'raw' => $totalableColumn->rawExpression(),

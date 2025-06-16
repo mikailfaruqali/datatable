@@ -86,4 +86,9 @@ class DummyClass extends DataTable
 
         ];
     }
+
+    public function totalableContainer(): ?string
+    {
+        return NULL;
+    }
 }

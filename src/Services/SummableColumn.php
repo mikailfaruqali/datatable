@@ -59,13 +59,6 @@ class SummableColumn
         return $this;
     }
 
-    public function selector(): self
-    {
-        $this->attributes['selector'] ??= $this->getKey();
-
-        return $this;
-    }
-
     public function getKey(): string
     {
         return $this->attributes['key'] ?? $this->attributes['column'];
@@ -99,11 +92,6 @@ class SummableColumn
     public function getFormmater(): ?callable
     {
         return $this->attributes['formatter'] ?? NULL;
-    }
-
-    public function getSelector(): string
-    {
-        return $this->attributes['selector'] ?? $this->getKey();
     }
 
     public function toArray(): array

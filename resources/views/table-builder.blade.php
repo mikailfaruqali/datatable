@@ -51,6 +51,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     data[$(this).attr('name')] = $(this).val();
                 });
 			},
+            dataSrc: function (json) {
+                const $totals = $(`{{ datatable_print_html($totalableContainer) }}`);
+
+                $totals.empty();
+
+                $totals.length && Object.entries(json.totals).forEach(([key, value]) => {
+                    $totals.append(`<div class="col-md-3"><strong>${value.title}:</strong> ${value.value}</div>`);
+                });
+
+                return json.data;
+            },
         },
         columns: {{ datatable_print_html($columns) }},
     });
