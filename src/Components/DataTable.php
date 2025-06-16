@@ -83,7 +83,7 @@ abstract class DataTable
     public function editColumn($column, $callback, $condition = NULL): self
     {
         $this->editColumns[$column] = function ($row) use ($callback, $condition) {
-            if (is_callable($condition) && $condition($row) === FALSE) {
+            if (is_callable($condition) && $condition($row) == FALSE) {
                 return NULL;
             }
 
@@ -96,7 +96,7 @@ abstract class DataTable
     public function addColumn($column, $callback, $condition = NULL): self
     {
         $this->addColumns[$column] = function ($row) use ($callback, $condition) {
-            if (is_callable($condition) && $condition($row) === FALSE) {
+            if (is_callable($condition) && $condition($row) == FALSE) {
                 return NULL;
             }
 
@@ -178,11 +178,11 @@ abstract class DataTable
 
         $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
 
-        if ($evaluate($column['visible'] ?? TRUE) === FALSE) {
+        if ($evaluate($column['visible'] ?? TRUE) == FALSE) {
             return FALSE;
         }
 
-        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) === FALSE);
+        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) == FALSE);
     }
 
     private function prepareRows(): Collection
@@ -269,7 +269,7 @@ abstract class DataTable
 
         $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
 
-        if ($evaluate($totalableColumn->getVisible()) === FALSE) {
+        if ($evaluate($totalableColumn->getVisible()) == FALSE) {
             return FALSE;
         }
 
