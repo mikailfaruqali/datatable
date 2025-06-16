@@ -74,27 +74,35 @@ class DatatableProcess
     private function handlePrintPage($datatable)
     {
         $exportColumns = $this->exportColumns($datatable);
+        $responseData = $this->exportData($datatable);
 
         return view('snawbar-datatable::print', [
-            'rows' => $this->exportData($datatable, $exportColumns),
+            'rows' => $this->exportDataForColumns($responseData->data, $exportColumns),
             'headers' => $this->getExportHeaders($exportColumns),
             'title' => $datatable->exportTitle(),
+            'totals' => (array) $responseData->totals,
         ]);
     }
 
     private function handleExcelExport($datatable)
     {
         $exportColumns = $this->exportColumns($datatable);
+        $responseData = $this->exportData($datatable);
 
         return Excel::download(new Exportable(
-            $this->exportData($datatable, $exportColumns),
+            $this->exportDataForColumns($responseData->data, $exportColumns),
             $this->getExportHeaders($exportColumns),
         ), sprintf('%s.xlsx', $datatable->exportTitle()));
     }
 
-    private function exportData($datatable, $exportColumns = NULL)
+    private function exportData($datatable)
     {
-        return $this->mapDataKeysToTitles(collect($datatable->ajax()->getData()->data), $exportColumns);
+        return $datatable->ajax()->getData();
+    }
+
+    private function exportDataForColumns($data, $exportColumns = NULL)
+    {
+        return $this->mapDataKeysToTitles(collect($data), $exportColumns);
     }
 
     private function exportColumns($datatable)

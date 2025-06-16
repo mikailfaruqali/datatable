@@ -2,10 +2,9 @@
 
 namespace DummyNamespace;
 
-use Snawbar\DataTable\Components\DataTable;
-use Illuminate\Http\Request;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Snawbar\DataTable\Components\DataTable;
 
 class DummyClass extends DataTable
 {
@@ -21,21 +20,19 @@ class DummyClass extends DataTable
         ];
     }
 
-    public function setupColumns(): void 
+    public function setupColumns(): void
     {
-        $this->addColumn('action', function ($row) {
-            
-        });
+        //
     }
 
     public function tableId(): string
     {
-        return 'datatables';
+        return 'dummy-table';
     }
 
     public function iteration(): bool
     {
-        return false;
+        return FALSE;
     }
 
     public function filterContainer(): ?string
@@ -50,7 +47,7 @@ class DummyClass extends DataTable
 
     public function isOrderable(): bool
     {
-        return false;
+        return FALSE;
     }
 
     public function defaultOrderBy(): array
@@ -81,5 +78,12 @@ class DummyClass extends DataTable
     public function exportTitle(): ?string
     {
         return NULL;
+    }
+
+    public function totalableColumns(): ?array
+    {
+        return [
+
+        ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Snawbar\DataTable;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Snawbar\DataTable\Console\MakeDataTableCommand;
 
@@ -9,6 +10,7 @@ class DataTableServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        $this->macros();
         $this->publishAssets();
     }
 
@@ -32,5 +34,10 @@ class DataTableServiceProvider extends ServiceProvider
                 __DIR__ . '/../resources/views' => resource_path('views/vendor/snawbar-datatable'),
             ], 'snawbar-datatable-assets');
         }
+    }
+
+    private function macros()
+    {
+        Blade::directive('datatableRowSpace', fn ($expression) => str_repeat('<tr><td colspan="100%" class="border-none"></td></tr>', $expression));
     }
 }

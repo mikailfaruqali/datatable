@@ -24,30 +24,30 @@
             font-size: 14px;
         }
 
-        table.table-bordered {
-            border: 1px solid #181c32 !important
-        }
-
-        table.table-bordered>thead>tr>th {
+        table.table-bordered>thead>tr>th:not(.border-none) {
+            background-color: rgb(155, 194, 230) !important;
             border: 1px solid #181c32 !important;
             font-size: 15px;
-            font-weight: bold;
-            text-overflow: ellipsis;
+            color: black !important;
+            padding: 3px !important
+        }
+
+        table.table-bordered>tbody>tr>td:not(.border-none) {
+            border: 1px solid #181c32 !important;
+            font-size: 15px;
+            color: black !important;
+            padding: 2px !important
+        }
+
+        table.table-bordered>tfoot>tr>td:not(.border-none) {
+            border: 1px solid #181c32 !important;
+            font-size: 15px;
+            font-weight: 700;
             color: black !important
         }
 
-        table.table-bordered>tbody>tr>td {
-            border: 1px solid #181c32 !important;
-            font-size: 15px;
-            text-overflow: ellipsis;
-            color: black !important
-        }
-
-        table.table-bordered>tfoot>tr>td {
-            border: 1px solid #181c32 !important;
-            font-size: 15px;
-            text-overflow: ellipsis;
-            color: black !important
+        .border-none {
+            border: none !important
         }
 
         .fieldset-top-border {
@@ -87,6 +87,22 @@
                 </tr>
             @endforeach
         </tbody>
+        <tfoot>
+
+            @datatableRowSpace(5)
+
+            @foreach ($totals as $alias => $total)
+                <tr>
+                    <td colspan="2">
+                        {{ $total->title }}
+                    </td>
+                    <td colspan="5">
+                        {{ $total->value }}
+                    </td>
+                </tr>
+            @endforeach
+        </tfoot>
+
     </table>
 
     <script>

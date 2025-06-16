@@ -4,9 +4,11 @@ namespace Snawbar\DataTable\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Snawbar\DataTable\Services\SummableColumn;
 
 abstract class DataTable
 {
@@ -15,8 +17,6 @@ abstract class DataTable
     private array $editColumns = [];
 
     private array $addColumns = [];
-
-    private array $additionalData = [];
 
     private Builder $builder;
 
@@ -80,7 +80,7 @@ abstract class DataTable
         return NULL;
     }
 
-    public function editColumn($column, $callback, $condition = NULL)
+    public function editColumn($column, $callback, $condition = NULL): self
     {
         $this->editColumns[$column] = function ($row) use ($callback, $condition) {
             if (is_callable($condition) && $condition($row) === FALSE) {
@@ -93,7 +93,7 @@ abstract class DataTable
         return $this;
     }
 
-    public function addColumn($column, $callback, $condition = NULL)
+    public function addColumn($column, $callback, $condition = NULL): self
     {
         $this->addColumns[$column] = function ($row) use ($callback, $condition) {
             if (is_callable($condition) && $condition($row) === FALSE) {
@@ -113,28 +113,27 @@ abstract class DataTable
         return FALSE;
     }
 
-    public function withData($data)
+    public function totalableColumns(): ?array
     {
-        $this->additionalData = is_array($data) ? array_merge($this->additionalData, $data) : [$data];
-
-        return $this;
+        return NULL;
     }
 
-    public function ajax()
+    public function ajax(): JsonResponse
     {
-        $totalRecords = $this->totalRecords();
+        [$totalRecords, $aggregateQuery] = $this->prepareAggregateQuery();
 
         $rows = $this->prepareRows();
 
-        return response()->json(array_merge([
+        return response()->json([
             'draw' => request('draw', 1),
             'recordsTotal' => $totalRecords,
             'recordsFiltered' => $totalRecords,
+            'totals' => $aggregateQuery,
             'data' => $rows,
-        ], $this->additionalData));
+        ]);
     }
 
-    public function html()
+    public function html(): string
     {
         return view('snawbar-datatable::table-builder', [
             'tableId' => $this->tableId(),
@@ -154,12 +153,12 @@ abstract class DataTable
         ])->render();
     }
 
-    public function tableRedrawFunctionString()
+    public function tableRedrawFunctionString(): string
     {
         return sprintf('%s()', $this->tableRedrawFunction());
     }
 
-    public function jsSafeTableId()
+    public function jsSafeTableId(): string
     {
         return str_replace('-', '_', $this->tableId());
     }
@@ -186,7 +185,7 @@ abstract class DataTable
         return ! (request()->hasAny(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) === FALSE);
     }
 
-    private function prepareRows()
+    private function prepareRows(): Collection
     {
         $start = request()->input('start', 0);
         $length = request()->input('length', 10);
@@ -215,15 +214,73 @@ abstract class DataTable
         return $rows;
     }
 
-    private function totalRecords()
+    private function prepareAggregateQuery(): array
     {
-        return DB::query()
+        $totalableColumns = $this->processTotalableColumns();
+
+        $aggregateQuery = DB::query()
             ->fromSub($this->builder, 'totals')
-            ->selectRaw('count(*) as total_records')
-            ->value('total_records');
+            ->selectRaw('COUNT(*) as total_records')
+            ->when($this->isSummable(), function ($query) use ($totalableColumns) {
+                $query->addSelect($totalableColumns->pluck('raw')->all());
+            })
+            ->first();
+
+        $totalRecords = $aggregateQuery->total_records;
+
+        unset($aggregateQuery->total_records);
+
+        $aggregateQuery = collect($aggregateQuery)
+            ->mapWithKeys(function ($value, $alias) use ($totalableColumns) {
+                $column = $totalableColumns->firstWhere('alias', $alias);
+
+                return [
+                    $alias => [
+                        'title' => $column['title'],
+                        'selector' => $column['selector'],
+                        'value' => $column['resolve']($value),
+                    ],
+                ];
+            })
+            ->all();
+
+        return [$totalRecords, $aggregateQuery];
     }
 
-    private function tableRedrawFunction()
+    private function processTotalableColumns(): Collection
+    {
+        return collect($this->totalableColumns())
+            ->map(fn ($totalableColumn) => $totalableColumn instanceof SummableColumn ? $totalableColumn : SummableColumn::make($totalableColumn))
+            ->filter(fn ($totalableColumn) => $this->shouldIncludeSummableColumns($totalableColumn))
+            ->map(fn ($totalableColumn) => [
+                'selector' => $totalableColumn->getSelector(),
+                'title' => $totalableColumn->getTitle(),
+                'alias' => $totalableColumn->getAlias(),
+                'raw' => $totalableColumn->rawExpression(),
+                'resolve' => fn ($value) => $totalableColumn->getFormmater() ? $totalableColumn->getFormmater()($value) : $value,
+            ]);
+    }
+
+    private function shouldIncludeSummableColumns($totalableColumn): bool
+    {
+        if (blank($totalableColumn->getKey())) {
+            return FALSE;
+        }
+
+        $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
+
+        if ($evaluate($totalableColumn->getVisible()) === FALSE) {
+            return FALSE;
+        }
+
+        if ($totalableColumn->getColumn()) {
+            return $this->processColumns()->pluck('data')->contains($totalableColumn->getColumn());
+        }
+
+        return TRUE;
+    }
+
+    private function tableRedrawFunction(): string
     {
         return sprintf('%s_redraw', $this->jsSafeTableId());
     }
@@ -260,5 +317,10 @@ abstract class DataTable
     private function defaultOrderByString(): string
     {
         return implode(' ', $this->defaultOrderBy());
+    }
+
+    private function isSummable(): bool
+    {
+        return request()->ajax() || request()->has('print');
     }
 }

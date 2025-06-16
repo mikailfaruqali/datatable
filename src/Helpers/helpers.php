@@ -7,7 +7,7 @@ function datatableProcess($datatables): DatatableProcess
     return new DatatableProcess($datatables);
 }
 
-function asset_or_url($path)
+function asset_or_url($path): ?string
 {
     if (blank($path)) {
         return NULL;
