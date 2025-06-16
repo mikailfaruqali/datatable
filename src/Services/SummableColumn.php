@@ -9,7 +9,7 @@ class SummableColumn
 {
     protected array $attributes = [];
 
-    public static function make($column): static
+    public static function make($column): self
     {
         return tap(new static, fn ($instance) => $instance->attributes += [
             'key' => $column,
@@ -17,42 +17,42 @@ class SummableColumn
         ]);
     }
 
-    public function key($key): static
+    public function key($key): self
     {
         $this->attributes['key'] = $key;
 
         return $this;
     }
 
-    public function alias($alias): static
+    public function alias($alias): self
     {
         $this->attributes['alias'] = $alias;
 
         return $this;
     }
 
-    public function title($title): static
+    public function title($title): self
     {
         $this->attributes['title'] = $title;
 
         return $this;
     }
 
-    public function formatUsing($callback = NULL): static
+    public function formatUsing($callback = NULL): self
     {
         $this->attributes['formatter'] = $callback;
 
         return $this;
     }
 
-    public function relatedColumn($column = NULL): static
+    public function relatedColumn($column = NULL): self
     {
         $this->attributes['column'] = $column;
 
         return $this;
     }
 
-    public function visible($flag = TRUE): static
+    public function visible($flag = TRUE): self
     {
         $this->attributes['visible'] = $flag;
 
