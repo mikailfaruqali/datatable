@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 			},
         },
-        columns: @json($columns)
+        columns: {{ datatable_print_html($columns) }},
     });
 });
 

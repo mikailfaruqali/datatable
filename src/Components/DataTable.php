@@ -143,7 +143,7 @@ abstract class DataTable
             'defaultOrderBy' => $this->defaultOrderBy(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
-            'columns' => $this->processColumns()->all(),
+            'columns' => $this->processColumns()->values()->toJson(),
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'filterContainer' => $this->filterContainer(),
