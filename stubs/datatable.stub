@@ -87,8 +87,13 @@ class DummyClass extends DataTable
         ];
     }
 
-    public function totalableContainer(): ?string
+    public function totalableTemplate(): string
     {
-        return NULL;
+        return parent::totalableTemplate();
+    }
+
+    public function totalableItemTemplate(): string
+    {
+        return parent::totalableItemTemplate();
     }
 }

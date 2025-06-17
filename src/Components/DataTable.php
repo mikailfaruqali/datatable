@@ -118,9 +118,28 @@ abstract class DataTable
         return NULL;
     }
 
-    public function totalableContainer(): ?string
+    public function totalableTemplate(): string
     {
-        return NULL;
+        return config('snawbar-datatable.totalable-template');
+    }
+
+    public function totalableItemTemplate(): string
+    {
+        return config('snawbar-datatable.totalable-item-template');
+    }
+
+    public function tableTotalableFunctionString(): ?string
+    {
+        $replace = fn ($template, $data) => strtr($template, $data);
+
+        $items = $this->processTotalableColumns()
+            ->map(fn ($totalableColumn) => $replace($this->totalableItemTemplate(), [
+                ':title' => $totalableColumn['title'],
+                ':key' => $totalableColumn['key'],
+            ]))
+            ->join(' ');
+
+        return $replace($this->totalableTemplate(), [':items' => $items]);
     }
 
     public function ajax(): JsonResponse
@@ -152,7 +171,6 @@ abstract class DataTable
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'filterContainer' => $this->filterContainer(),
-            'totalableContainer' => $this->totalableContainer(),
             'printButtonSelector' => $this->printButtonSelector(),
             'excelButtonSelector' => $this->excelButtonSelector(),
             'exportTitle' => $this->exportTitle(),
@@ -258,6 +276,7 @@ abstract class DataTable
             ->map(fn ($totalableColumn) => $totalableColumn instanceof SummableColumn ? $totalableColumn : SummableColumn::make($totalableColumn))
             ->filter(fn ($totalableColumn) => $this->shouldIncludeSummableColumns($totalableColumn))
             ->map(fn ($totalableColumn) => [
+                'key' => $totalableColumn->getKey(),
                 'title' => $totalableColumn->getTitle(),
                 'alias' => $totalableColumn->getAlias(),
                 'raw' => $totalableColumn->rawExpression(),
