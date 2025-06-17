@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Snawbar\DataTable\Services\SummableColumn;
+use Snawbar\DataTable\Services\Total;
 
 abstract class DataTable
 {
@@ -118,12 +118,12 @@ abstract class DataTable
         return NULL;
     }
 
-    public function totalableTemplate(): string
+    public function totalableTemplate(): ?string
     {
         return config('snawbar-datatable.totalable-template');
     }
 
-    public function totalableItemTemplate(): string
+    public function totalableItemTemplate(): ?string
     {
         return config('snawbar-datatable.totalable-item-template');
     }
@@ -135,7 +135,7 @@ abstract class DataTable
         $items = $this->processTotalableColumns()
             ->map(fn ($totalableColumn) => $replace($this->totalableItemTemplate(), [
                 ':title' => $totalableColumn['title'],
-                ':key' => $totalableColumn['key'],
+                ':alias' => $totalableColumn['alias'],
             ]))
             ->join(' ');
 
@@ -245,7 +245,7 @@ abstract class DataTable
         $aggregateQuery = DB::query()
             ->fromSub($this->builder, 'totals')
             ->selectRaw('COUNT(*) as total_records')
-            ->when($this->isSummable(), function ($query) use ($totalableColumns) {
+            ->when($this->isTotalable(), function ($query) use ($totalableColumns) {
                 $query->addSelect($totalableColumns->pluck('raw')->all());
             })
             ->first();
@@ -273,10 +273,9 @@ abstract class DataTable
     private function processTotalableColumns(): Collection
     {
         return collect($this->totalableColumns())
-            ->map(fn ($totalableColumn) => $totalableColumn instanceof SummableColumn ? $totalableColumn : SummableColumn::make($totalableColumn))
-            ->filter(fn ($totalableColumn) => $this->shouldIncludeSummableColumns($totalableColumn))
+            ->map(fn ($totalableColumn) => $totalableColumn instanceof Total ? $totalableColumn : Total::make($totalableColumn))
+            ->filter(fn ($totalableColumn) => $this->shouldIncludeTotalableColumns($totalableColumn))
             ->map(fn ($totalableColumn) => [
-                'key' => $totalableColumn->getKey(),
                 'title' => $totalableColumn->getTitle(),
                 'alias' => $totalableColumn->getAlias(),
                 'raw' => $totalableColumn->rawExpression(),
@@ -284,9 +283,9 @@ abstract class DataTable
             ]);
     }
 
-    private function shouldIncludeSummableColumns($totalableColumn): bool
+    private function shouldIncludeTotalableColumns($totalableColumn): bool
     {
-        if (blank($totalableColumn->getKey())) {
+        if (blank($totalableColumn->getColumn())) {
             return FALSE;
         }
 
@@ -342,7 +341,7 @@ abstract class DataTable
         return implode(' ', $this->defaultOrderBy());
     }
 
-    private function isSummable(): bool
+    private function isTotalable(): bool
     {
         return request()->ajax() || request()->has('print');
     }

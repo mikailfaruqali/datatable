@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
             dataSrc: function (json) {
                 Object.entries(json.totals).forEach(([key, value]) => {
-                    $(`#${value.key}`).text(value.value);
+                    $(`#${key}`).text(value.value);
                 });
 
                 return json.data;

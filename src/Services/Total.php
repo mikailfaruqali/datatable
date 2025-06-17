@@ -5,21 +5,21 @@ namespace Snawbar\DataTable\Services;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 
-class SummableColumn
+class Total
 {
     protected array $attributes = [];
 
     public static function make($column): self
     {
         return tap(new static, fn ($instance) => $instance->attributes += [
-            'key' => $column,
+            'column' => $column,
             'alias' => $column,
         ]);
     }
 
-    public function key($key): self
+    public function column($column): self
     {
-        $this->attributes['key'] = $key;
+        $this->attributes['column'] = $column;
 
         return $this;
     }
@@ -59,29 +59,24 @@ class SummableColumn
         return $this;
     }
 
-    public function getKey(): string
+    public function getColumn(): string
     {
         return $this->attributes['key'] ?? $this->attributes['column'];
     }
 
     public function getAlias(): string
     {
-        return $this->attributes['alias'] ?? $this->getKey();
+        return $this->attributes['alias'] ?? $this->getColumn();
     }
 
     public function getTitle(): string
     {
-        return $this->attributes['title'] ?? $this->getKey();
+        return $this->attributes['title'] ?? $this->getColumn();
     }
 
     public function rawExpression(): Expression
     {
-        return DB::raw(sprintf('SUM(%s) as %s', $this->getKey(), $this->getAlias()));
-    }
-
-    public function getColumn(): ?string
-    {
-        return $this->attributes['column'] ?? NULL;
+        return DB::raw(sprintf('SUM(%s) as %s', $this->getColumn(), $this->getAlias()));
     }
 
     public function getVisible()

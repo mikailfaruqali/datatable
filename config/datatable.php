@@ -58,7 +58,7 @@ return [
         <div class="col">
             <div class="border p-2 rounded d-flex justify-content-between">
                 <span>:title</span> 
-                <strong id=":key"></strong> 
+                <strong id=":alias"></strong> 
             </div>
         </div>
     HTML,
