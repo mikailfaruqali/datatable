@@ -64,8 +64,8 @@ class DatatableProcess
     {
         return collect($this->tables)->mapWithKeys(fn ($table) => [
             $table->jsSafeTableId() => (object) [
-                'tableRedraw' => $table->tableRedrawFunctionString(),
-                'tableTotalable' => $table->tableTotalableFunctionString(),
+                'tableRedraw' => $table->tableRedrawFunction(),
+                'tableTotalableHtml' => $table->tableTotalableHtml(),
                 'datatable' => $table->html(),
                 'tableId' => $table->tableId(),
             ],

@@ -10,4 +10,5 @@ return [
     "hich datayak la xshtada bardast nia" => "No available data",
     "hich tomarek nadozrayawa" => "There is nothing to show",
     "chawarwanba" => "Please wait...",
+    "load" => "Load",
 ];

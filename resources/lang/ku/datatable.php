@@ -10,4 +10,5 @@ return [
     "hich datayak la xshtada bardast nia" => "هیچ زانیاریەک بەردەست نییە",
     "hich tomarek nadozrayawa" => "هیچ تۆمارێک نەدۆزرایەوە",
     "chawarwanba" => "چاوەڕوانبە ...",
+    "load" => "ڕاکێشان",
 ];

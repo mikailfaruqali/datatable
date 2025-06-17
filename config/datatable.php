@@ -39,8 +39,12 @@ return [
     */
 
     'totalable-template' => <<<'HTML'
-        <div class="row">
-            :items
+        <div class="row align-items-center mb-2">
+            <div class="col-lg-12 col-xl-12">
+                <div class="row g-1 align-items-center">
+                    :items
+                </div>
+            </div>
         </div>
     HTML,
 
@@ -56,9 +60,15 @@ return [
 
     'totalable-item-template' => <<<'HTML'
         <div class="col">
-            <div class="border p-2 rounded d-flex justify-content-between">
-                <span>:title</span> 
-                <strong id=":alias"></strong> 
+            <div class="card shadow-lg h-100">
+                <div class="card-body rounded p-2 text-truncate d-flex flex-column justify-content-center align-items-center">
+                    <h6 class="card-title mb-2 text-center text-truncate">:title</h6>
+                    <div id=":alias" class="d-flex justify-content-center align-items-center">
+                        <a href="javascript:void(0)" onclick=":load_function" class="btn btn-link p-0">
+                            :load_text
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     HTML,

@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function () {
             url: '{{ $ajaxUrl }}',
             data: function(data) {
                 data.tableId = '{{ $jsSafeTableId }}';
-                
+                data.totalable = $(`meta[name='{{ $jsSafeTableId }}-table-totalable']`).attr('content');
+
 				$('{{ $filterContainer }}').find('input, select, textarea').each(function () {
                     data[$(this).attr('name')] = $(this).val();
                 });
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function {{ $tableRedrawFunction }}() {
+function {{ $tableRedrawFunction }} {
     $('#{{ $tableId }}').DataTable().draw();
 }
 
@@ -106,4 +107,12 @@ function {{ $jsSafeTableId }}_getTableCurrentUrl(extra = {}) {
         {{ $jsSafeTableId }}_downloadFile({{ $jsSafeTableId }}_getTableCurrentUrl({excel: 1}), '{{ $exportTitle }}');
     });
 @endif
+
+function {{ $loadTotatableFunction }} {
+    if ($(`meta[name='{{ $jsSafeTableId }}-table-totalable']`).length === 0) {
+        $('meta[name="csrf-token"]').after($('<meta>').attr('name', `{{ $jsSafeTableId }}-table-totalable`).attr('content', 'true'));
+    }
+
+    {{ $tableRedrawFunction }};
+}
 </script>

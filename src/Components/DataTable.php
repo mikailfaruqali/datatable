@@ -128,7 +128,7 @@ abstract class DataTable
         return config('snawbar-datatable.totalable-item-template');
     }
 
-    public function tableTotalableFunctionString(): ?string
+    public function tableTotalableHtml(): ?string
     {
         $replace = fn ($template, $data) => strtr($template, $data);
 
@@ -136,6 +136,8 @@ abstract class DataTable
             ->map(fn ($totalableColumn) => $replace($this->totalableItemTemplate(), [
                 ':title' => $totalableColumn['title'],
                 ':alias' => $totalableColumn['alias'],
+                ':load_function' => $this->loadTotatableFunction(),
+                ':load_text' => __('snawbar-datatable::datatable.load'),
             ]))
             ->join(' ');
 
@@ -170,6 +172,7 @@ abstract class DataTable
             'columns' => $this->processColumns()->values()->toJson(),
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
+            'loadTotatableFunction' => $this->loadTotatableFunction(),
             'filterContainer' => $this->filterContainer(),
             'printButtonSelector' => $this->printButtonSelector(),
             'excelButtonSelector' => $this->excelButtonSelector(),
@@ -177,9 +180,9 @@ abstract class DataTable
         ])->render();
     }
 
-    public function tableRedrawFunctionString(): string
+    public function tableRedrawFunction(): string
     {
-        return sprintf('%s()', $this->tableRedrawFunction());
+        return sprintf('%s_redraw()', $this->jsSafeTableId());
     }
 
     public function jsSafeTableId(): string
@@ -302,9 +305,9 @@ abstract class DataTable
         return TRUE;
     }
 
-    private function tableRedrawFunction(): string
+    private function loadTotatableFunction(): string
     {
-        return sprintf('%s_redraw', $this->jsSafeTableId());
+        return sprintf('%s_loadTotalable()', $this->jsSafeTableId());
     }
 
     private function buildSortClause(): string
@@ -343,6 +346,6 @@ abstract class DataTable
 
     private function isTotalable(): bool
     {
-        return request()->ajax() || request()->has('print');
+        return filled(request('totalable')) && (request()->ajax() || request()->has('print'));
     }
 }
