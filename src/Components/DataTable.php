@@ -20,6 +20,8 @@ abstract class DataTable
 
     private Builder $builder;
 
+    private array $hiddenColumns = [];
+
     public function __construct(Request $request)
     {
         $this->builder = $this->query($request);
@@ -27,6 +29,8 @@ abstract class DataTable
         $this->request = $request;
 
         $this->setupColumns();
+
+        $this->hiddenColumns = $this->getHiddenColumns();
     }
 
     abstract protected function query(Request $request): Builder;
@@ -183,7 +187,7 @@ abstract class DataTable
     {
         return collect($this->columns())
             ->map(fn ($column) => is_array($column) ? $column : $column->toArray())
-            ->filter(fn ($column) => $this->shouldIncludeColumn($column))
+            ->filter(fn ($column) => $this->shouldIncludeColumn($column) && ! in_array($column['data'], $this->hiddenColumns))
             ->when($this->request->hasAny(['print', 'excel']), fn ($columns) => $this->filterByRequestedColumns($columns));
     }
 
@@ -199,6 +203,14 @@ abstract class DataTable
             'buttonPrintFunction' => $this->buttonPrintFunction(),
             'buttonExcelFunction' => $this->buttonExcelFunction(),
         ])->render();
+    }
+
+    private function getHiddenColumns(): array
+    {
+        return DB::table('datatable_columns')
+            ->where('datatable', $this->jsSafeTableId())
+            ->pluck('column')
+            ->toArray();
     }
 
     private function exportableModalHtml(): ?string
@@ -225,10 +237,19 @@ abstract class DataTable
             return NULL;
         }
 
+        $columns = collect($this->columns())
+            ->map(fn ($column) => is_array($column) ? $column : $column->toArray())
+            ->filter(fn ($column) => $this->shouldIncludeColumn($column))
+            ->map(fn ($column) => [
+                'data' => $column['data'],
+                'title' => $column['title'] ?? $column['data'],
+                'checked' => ! in_array($column['data'], $this->hiddenColumns),
+            ]);
+
         return view('snawbar-datatable::column-modal', [
-            'columns' => collect($this->columns())->map(fn ($column) => is_array($column) ? $column : $column->toArray()),
             'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
             'columnModalId' => $this->columnModalId(),
+            'columns' => $columns,
         ])->render();
     }
 
@@ -261,6 +282,7 @@ abstract class DataTable
             ->map(fn ($column) => [
                 'data' => $column['data'],
                 'title' => $column['title'] ?? $column['data'],
+                'checked' => ! in_array($column['data'], $this->hiddenColumns),
             ]);
     }
 

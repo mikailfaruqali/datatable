@@ -1,7 +1,7 @@
 <table id="{{ $tableId }}" class="{{ config('snawbar-datatable.table-style') }} {{ $tableClass }}"></table>
 
-{{ datatable_print_html($exportableModalHtml) }}
-{{ datatable_print_html($columnModalHtml) }}
+{{ datatablePrintHtml($exportableModalHtml) }}
+{{ datatablePrintHtml($columnModalHtml) }}
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return alert('Error: DataTable plugin not loaded');
     }
 
-    const order = {{ datatable_print_html(datatable_when($isOrderable, json_encode($defaultOrderBy), '[]')) }};
+    const order = {{ datatablePrintHtml(datatableWhen($isOrderable, json_encode($defaultOrderBy), '[]')) }};
 
     $('#{{ $tableId }}').DataTable({
         deferRender: true,
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return json.data;
             },
         },
-        columns: {{ datatable_print_html($columns) }},
+        columns: {{ datatablePrintHtml($columns) }},
     });
 });
 
