@@ -1,5 +1,7 @@
 <table id="{{ $tableId }}" class="{{ config('snawbar-datatable.table-style') }} {{ $tableClass }}"></table>
 
+{{ datatable_print_html($exportableModalHtml) }}
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     if (! $.fn.DataTable) {
@@ -102,15 +104,29 @@ function {{ $jsSafeTableId }}_getTableCurrentUrl(extra = {}) {
 }
 
 function {{ $buttonPrintFunction }} {
-    window.open({{ $jsSafeTableId }}_getTableCurrentUrl({print: 1}), '_blank', 'width=4000,height=4000');
+    const url = window["{{ $jsSafeTableId }}_getTableCurrentUrl"]({
+        columns: getCheckedColumns().join(','),
+        print: 1,
+    });
+
+    window.open(url, '_blank', 'width=4000,height=4000');
 }
 
 function {{ $buttonExcelFunction }} {
-    {{ $jsSafeTableId }}_downloadFile({{ $jsSafeTableId }}_getTableCurrentUrl({excel: 1}), '{{ $exportTitle }}');
+    const url = window["{{ $jsSafeTableId }}_getTableCurrentUrl"]({
+        columns: getCheckedColumns().join(','),
+        excel: 1,
+    });
+
+    {{ $jsSafeTableId }}_downloadFile(url, '{{ $exportTitle }}');
 }
 
 function {{ $buttonColumnVisibilityFunction }} {
     alert('toogle column visibility');
+}
+
+function getCheckedColumns() {
+    return $('#{{ $exportableModalId }} input[type="checkbox"]:checked').map((_, el) => el.value).get();
 }
 
 function {{ $loadTotatableFunction }} {
@@ -120,4 +136,13 @@ function {{ $loadTotatableFunction }} {
 
     {{ $tableRedrawFunction }};
 }
+
+$(document).on('click', '.datatable-button-export', function () {
+    $('#{{ $exportableModalId }}_title').text($(this).data('modal-header-text'));
+    $('#{{ $exportableModalId }}_submit').attr('onclick', $(this).data('function-export')).text($(this).text());
+});
+
+$(document).on('click', '#{{ $exportableModalId }}_submit', function () {
+    $('#{{ $exportableModalId }}').modal('hide');
+});
 </script>

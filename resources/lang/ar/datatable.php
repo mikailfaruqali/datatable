@@ -14,4 +14,6 @@ return [
     "excel" => "اكسل",
     "print" => "طباعة",
     "toggle-columns" => "الحقول",
+    "tanha am xanana bka ba excel" => "تحويل الحقول المحددة إلى ملف إكسل",
+    "tanha am xanana chap bka" => "طباعة الحقول المحددة",
 ];

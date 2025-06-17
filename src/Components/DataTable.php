@@ -65,6 +65,11 @@ abstract class DataTable
         return FALSE;
     }
 
+    public function hasToolbar(): bool
+    {
+        return TRUE;
+    }
+
     public function exportTitle(): ?string
     {
         return NULL;
@@ -110,9 +115,15 @@ abstract class DataTable
 
     public function tableTotalableHtml(): ?string
     {
+        $columns = $this->processTotalableColumns();
+
+        if ($columns->isEmpty()) {
+            return NULL;
+        }
+
         return view('snawbar-datatable::totalable-toolbar', [
-            'columns' => $this->processTotalableColumns(),
             'loadTotatableFunction' => $this->loadTotatableFunction(),
+            'columns' => $columns,
         ])->render();
     }
 
@@ -142,7 +153,6 @@ abstract class DataTable
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
             'columns' => $this->processColumns()->values()->toJson(),
-            'columnExportable' => $this->exportableColumns()->values()->toJson(),
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'loadTotatableFunction' => $this->loadTotatableFunction(),
@@ -150,6 +160,8 @@ abstract class DataTable
             'buttonPrintFunction' => $this->buttonPrintFunction(),
             'buttonExcelFunction' => $this->buttonExcelFunction(),
             'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
+            'exportableModalId' => $this->exportableModalId(),
+            'exportableModalHtml' => $this->exportableModalHtml(),
             'exportTitle' => $this->exportTitle(),
         ])->render();
     }
@@ -164,19 +176,43 @@ abstract class DataTable
         return str_replace('-', '_', $this->tableId());
     }
 
-    public function processColumns(): Collection
+    public function processColumns(): ?Collection
     {
         return collect($this->columns())
             ->map(fn ($column) => is_array($column) ? $column : $column->toArray())
-            ->filter(fn ($column) => $this->shouldIncludeColumn($column));
+            ->filter(fn ($column) => $this->shouldIncludeColumn($column))
+            ->when($this->request->hasAny(['print', 'excel']), fn ($columns) => $this->filterByRequestedColumns($columns));
     }
 
-    public function buttonHtml(): string
+    public function buttonHtml(): ?string
     {
+        if (! $this->hasToolbar()) {
+            return NULL;
+        }
+
         return view('snawbar-datatable::buttons-toolbar', [
+            'exportableModalId' => $this->exportableModalId(),
             'buttonPrintFunction' => $this->buttonPrintFunction(),
             'buttonExcelFunction' => $this->buttonExcelFunction(),
             'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
+        ])->render();
+    }
+
+    private function exportableModalHtml(): ?string
+    {
+        if (! $this->hasToolbar()) {
+            return NULL;
+        }
+
+        $columns = $this->exportableColumns();
+
+        if ($columns->isEmpty()) {
+            return NULL;
+        }
+
+        return view('snawbar-datatable::exportable-modal', [
+            'exportableModalId' => $this->exportableModalId(),
+            'columns' => $columns,
         ])->render();
     }
 
@@ -193,6 +229,13 @@ abstract class DataTable
         }
 
         return ! (request()->hasAny(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) == FALSE);
+    }
+
+    private function filterByRequestedColumns($columns): Collection
+    {
+        $requestColumns = explode(',', $this->request->input('columns', ''));
+
+        return $columns->filter(fn ($column) => in_array($column['data'], $requestColumns));
     }
 
     private function exportableColumns(): Collection
@@ -355,5 +398,10 @@ abstract class DataTable
     private function buttonColumnVisibilityFunction(): string
     {
         return sprintf('%s_column_visibility()', $this->jsSafeTableId());
+    }
+
+    private function exportableModalId(): string
+    {
+        return sprintf('%s_exportable_modal', $this->jsSafeTableId());
     }
 }

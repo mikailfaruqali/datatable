@@ -65,6 +65,11 @@ class DummyClass extends DataTable
         return FALSE;
     }
 
+    public function hasToolbar(): bool
+    {
+        return true;
+    }
+
     public function exportTitle(): ?string
     {
         return NULL;
