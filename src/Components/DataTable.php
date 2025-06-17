@@ -108,35 +108,12 @@ abstract class DataTable
         return NULL;
     }
 
-    public function buttonsTemplate(): string
-    {
-        return config('snawbar-datatable.button-template');
-    }
-
-    public function totalableTemplate(): ?string
-    {
-        return config('snawbar-datatable.totalable-template');
-    }
-
-    public function totalableItemTemplate(): ?string
-    {
-        return config('snawbar-datatable.totalable-item-template');
-    }
-
     public function tableTotalableHtml(): ?string
     {
-        $replace = fn ($template, $data) => strtr($template, $data);
-
-        $items = $this->processTotalableColumns()
-            ->map(fn ($totalableColumn) => $replace($this->totalableItemTemplate(), [
-                ':title' => $totalableColumn['title'],
-                ':alias' => $totalableColumn['alias'],
-                ':load_function' => $this->loadTotatableFunction(),
-                ':load_text' => __('snawbar-datatable::datatable.load'),
-            ]))
-            ->join(' ');
-
-        return $replace($this->totalableTemplate(), [':items' => $items]);
+        return view('snawbar-datatable::totalable-toolbar', [
+            'columns' => $this->processTotalableColumns(),
+            'loadTotatableFunction' => $this->loadTotatableFunction(),
+        ])->render();
     }
 
     public function ajax(): JsonResponse
@@ -196,16 +173,11 @@ abstract class DataTable
 
     public function buttonHtml(): string
     {
-        $replace = fn ($template, $data) => strtr($template, $data);
-
-        return $replace($this->buttonsTemplate(), [
-            ':printFunction' => $this->buttonPrintFunction(),
-            ':printText' => __('snawbar-datatable::datatable.print'),
-            ':excelFunction' => $this->buttonExcelFunction(),
-            ':excelText' => __('snawbar-datatable::datatable.excel'),
-            ':togglelFunction' => $this->buttonColumnVisibilityFunction(),
-            ':toggleText' => __('snawbar-datatable::datatable.toggle-columns'),
-        ]);
+        return view('snawbar-datatable::buttons-toolbar', [
+            'buttonPrintFunction' => $this->buttonPrintFunction(),
+            'buttonExcelFunction' => $this->buttonExcelFunction(),
+            'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
+        ])->render();
     }
 
     private function shouldIncludeColumn($column): bool

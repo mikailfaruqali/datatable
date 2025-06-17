@@ -76,19 +76,4 @@ class DummyClass extends DataTable
 
         ];
     }
-
-    public function buttonsTemplate(): string
-    {
-        return parent::buttonsTemplate();
-    }
-
-    public function totalableTemplate(): string
-    {
-        return parent::totalableTemplate();
-    }
-
-    public function totalableItemTemplate(): string
-    {
-        return parent::totalableItemTemplate();
-    }
 }
