@@ -16,4 +16,6 @@ return [
     "toggle-columns" => "The cells",
     "tanha am xanana bka ba excel" => "Export the selected fields into Excel file",
     "tanha am xanana chap bka" => "Print the Selected Fields",
+    "save" => "Save",
+    "daxstn" => "Close",
 ];

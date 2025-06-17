@@ -162,7 +162,10 @@ abstract class DataTable
             'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
             'exportableModalId' => $this->exportableModalId(),
             'exportableModalHtml' => $this->exportableModalHtml(),
+            'columnModalId' => $this->columnModalId(),
+            'columnModalHtml' => $this->columnModalHtml(),
             'exportTitle' => $this->exportTitle(),
+            'className' => static::class,
         ])->render();
     }
 
@@ -192,9 +195,9 @@ abstract class DataTable
 
         return view('snawbar-datatable::buttons-toolbar', [
             'exportableModalId' => $this->exportableModalId(),
+            'columnModalId' => $this->columnModalId(),
             'buttonPrintFunction' => $this->buttonPrintFunction(),
             'buttonExcelFunction' => $this->buttonExcelFunction(),
-            'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
         ])->render();
     }
 
@@ -213,6 +216,19 @@ abstract class DataTable
         return view('snawbar-datatable::exportable-modal', [
             'exportableModalId' => $this->exportableModalId(),
             'columns' => $columns,
+        ])->render();
+    }
+
+    private function columnModalHtml(): ?string
+    {
+        if (! $this->hasToolbar()) {
+            return NULL;
+        }
+
+        return view('snawbar-datatable::column-modal', [
+            'columns' => collect($this->columns())->map(fn ($column) => is_array($column) ? $column : $column->toArray()),
+            'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
+            'columnModalId' => $this->columnModalId(),
         ])->render();
     }
 
@@ -403,5 +419,10 @@ abstract class DataTable
     private function exportableModalId(): string
     {
         return sprintf('%s_exportable_modal', $this->jsSafeTableId());
+    }
+
+    private function columnModalId(): string
+    {
+        return sprintf('%s_column_modal', $this->jsSafeTableId());
     }
 }

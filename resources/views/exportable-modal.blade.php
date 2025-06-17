@@ -9,8 +9,8 @@
                     @foreach($columns as $column)
                         <li class="list-group-item">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="{{ $column['data'] }}" name="columns[]" value="{{ $column['data'] }}">
-                                <label class="custom-control-label" for="{{ $column['data'] }}">
+                                <input type="checkbox" class="custom-control-input" id="{{ $column['data'] }}_exportable" name="columns[]" value="{{ $column['data'] }}">
+                                <label class="custom-control-label" for="{{ $column['data'] }}_exportable">
                                     {{ $column['title'] ?? $column['data'] }}
                                 </label>
                             </div>
@@ -19,7 +19,7 @@
                 </ul>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">{{ __('all.daxstn') }}</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">{{ __('snawbar-datatable::datatable.daxstn') }}</button>
                 <button type="button" class="btn btn-primary mr-1" id="{{ $exportableModalId }}_submit"></button>
             </div>
         </div>

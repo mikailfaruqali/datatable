@@ -19,6 +19,8 @@ class DataTableServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/datatable.php', 'snawbar-datatable');
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'snawbar-datatable');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'snawbar-datatable');
+        $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
 
         $this->commands([
             MakeDataTableCommand::class,

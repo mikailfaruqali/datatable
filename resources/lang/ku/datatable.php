@@ -16,4 +16,6 @@ return [
     "toggle-columns" => "خانەکان",
     "tanha am xanana bka ba excel" => "تەنها ئەم خانانە بکە بە ئێکسڵ",
     "tanha am xanana chap bka" => "تەنها ئەم خانانە چاپ بکە",
+    "save" => "خەزنکردن",
+    "daxstn" => "داخستن",
 ];

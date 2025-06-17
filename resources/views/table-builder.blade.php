@@ -1,6 +1,7 @@
 <table id="{{ $tableId }}" class="{{ config('snawbar-datatable.table-style') }} {{ $tableClass }}"></table>
 
 {{ datatable_print_html($exportableModalHtml) }}
+{{ datatable_print_html($columnModalHtml) }}
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -122,7 +123,29 @@ function {{ $buttonExcelFunction }} {
 }
 
 function {{ $buttonColumnVisibilityFunction }} {
-    alert('toogle column visibility');
+    const btnText = $('#{{ $columnModalId }}_save').text();
+
+    const formData = new FormData(document.getElementById('{{ $columnModalId }}_form'));
+
+    formData.append('tableId',  @js($jsSafeTableId));
+    formData.append('className',  @js($className));
+
+    $.ajax({
+        type: 'POST',
+        url: '{{ route("datatable.columns") }}',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+            $('#{{ $columnModalId }}_save').html("{{ __('snawbar-datatable::datatable.chawarwanba') }}").prop("disabled", true);
+        },
+        success(response) {
+            window.location.reload();
+        },
+        complete: function() {
+            $('#{{ $columnModalId }}_save').html(btnText).prop("disabled", false);
+        },
+    });
 }
 
 function getCheckedColumns() {
