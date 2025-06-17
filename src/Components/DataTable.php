@@ -65,16 +65,6 @@ abstract class DataTable
         return FALSE;
     }
 
-    public function printButtonSelector(): ?string
-    {
-        return NULL;
-    }
-
-    public function excelButtonSelector(): ?string
-    {
-        return NULL;
-    }
-
     public function exportTitle(): ?string
     {
         return NULL;
@@ -116,6 +106,11 @@ abstract class DataTable
     public function totalableColumns(): ?array
     {
         return NULL;
+    }
+
+    public function buttonsTemplate(): string
+    {
+        return config('snawbar-datatable.button-template');
     }
 
     public function totalableTemplate(): ?string
@@ -170,12 +165,14 @@ abstract class DataTable
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
             'columns' => $this->processColumns()->values()->toJson(),
+            'columnExportable' => $this->exportableColumns()->values()->toJson(),
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'loadTotatableFunction' => $this->loadTotatableFunction(),
             'filterContainer' => $this->filterContainer(),
-            'printButtonSelector' => $this->printButtonSelector(),
-            'excelButtonSelector' => $this->excelButtonSelector(),
+            'buttonPrintFunction' => $this->buttonPrintFunction(),
+            'buttonExcelFunction' => $this->buttonExcelFunction(),
+            'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
             'exportTitle' => $this->exportTitle(),
         ])->render();
     }
@@ -197,6 +194,20 @@ abstract class DataTable
             ->filter(fn ($column) => $this->shouldIncludeColumn($column));
     }
 
+    public function buttonHtml(): string
+    {
+        $replace = fn ($template, $data) => strtr($template, $data);
+
+        return $replace($this->buttonsTemplate(), [
+            ':printFunction' => $this->buttonPrintFunction(),
+            ':printText' => __('snawbar-datatable::datatable.print'),
+            ':excelFunction' => $this->buttonExcelFunction(),
+            ':excelText' => __('snawbar-datatable::datatable.excel'),
+            ':togglelFunction' => $this->buttonColumnVisibilityFunction(),
+            ':toggleText' => __('snawbar-datatable::datatable.toggle-columns'),
+        ]);
+    }
+
     private function shouldIncludeColumn($column): bool
     {
         if (blank($column['data'])) {
@@ -210,6 +221,16 @@ abstract class DataTable
         }
 
         return ! (request()->hasAny(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) == FALSE);
+    }
+
+    private function exportableColumns(): Collection
+    {
+        return $this->processColumns()
+            ->filter(fn ($column) => $column['exportable'] ?? TRUE)
+            ->map(fn ($column) => [
+                'data' => $column['data'],
+                'title' => $column['title'] ?? $column['data'],
+            ]);
     }
 
     private function prepareRows(): Collection
@@ -347,5 +368,20 @@ abstract class DataTable
     private function isTotalable(): bool
     {
         return filled(request('totalable')) && (request()->ajax() || request()->has('print'));
+    }
+
+    private function buttonPrintFunction(): string
+    {
+        return sprintf('%s_print()', $this->jsSafeTableId());
+    }
+
+    private function buttonExcelFunction(): string
+    {
+        return sprintf('%s_excel()', $this->jsSafeTableId());
+    }
+
+    private function buttonColumnVisibilityFunction(): string
+    {
+        return sprintf('%s_column_visibility()', $this->jsSafeTableId());
     }
 }

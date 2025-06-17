@@ -11,4 +11,7 @@ return [
     "hich tomarek nadozrayawa" => "لم تتم ايجاد اي بيانات",
     "chawarwanba" => "يرجى الانتظار ...",
     "load" => "تحميل",
+    "excel" => "اكسل",
+    "print" => "طباعة",
+    "toggle-columns" => "الحقول",
 ];

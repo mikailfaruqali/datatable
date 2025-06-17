@@ -11,4 +11,7 @@ return [
     "hich tomarek nadozrayawa" => "There is nothing to show",
     "chawarwanba" => "Please wait...",
     "load" => "Load",
+    "excel" => "Excel",
+    "print" => "Print",
+    "toggle-columns" => "The cells",
 ];

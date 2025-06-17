@@ -30,6 +30,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Button Template
+    |--------------------------------------------------------------------------
+    |
+    | This option defines the Blade view or HTML snippet used to render the
+    | export buttons (e.g., PDF, Excel) and column visibility toggles in
+    | the DataTable UI. You may set this to a custom Blade view path or
+    | leave it empty to use the default provided by the package.
+    |
+    */
+
+    'button-template' => <<<'HTML'
+        <div class="btn-group mb-2">
+            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Export / Columns
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick=":printFunction">:printText</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick=":excelFunction">:excelText</a></li>
+                <li><a class="dropdown-item" href="javascript:void(0)" onclick=":togglelFunction">:toggleText</a></li>
+            </ul>
+        </div>
+    HTML,
+
+    /*
+    |--------------------------------------------------------------------------
     | Total Template
     |--------------------------------------------------------------------------
     |

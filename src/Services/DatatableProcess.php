@@ -15,13 +15,13 @@ class DatatableProcess
         $this->initializeTables($datatableClassesOrInstances);
     }
 
-    public function render($view = NULL)
+    public function view($view = NULL, $data = [])
     {
         if (request()->ajax() || request()->hasAny(['print', 'excel'])) {
             return $this->handleAjax();
         }
 
-        return $this->renderView($view);
+        return $this->renderView($view, $data);
     }
 
     private function initializeTables($datatables): void
@@ -55,9 +55,9 @@ class DatatableProcess
         return NULL;
     }
 
-    private function renderView($view = NULL)
+    private function renderView($view = NULL, $data = [])
     {
-        return is_null($view) ? $this->renderTables() : view($view, $this->renderTables());
+        return is_null($view) ? $this->renderTables() : view($view, $this->renderTables()->toArray() + $data);
     }
 
     private function renderTables()
@@ -66,6 +66,7 @@ class DatatableProcess
             $table->jsSafeTableId() => (object) [
                 'tableRedraw' => $table->tableRedrawFunction(),
                 'tableTotalableHtml' => $table->tableTotalableHtml(),
+                'buttonHtml' => $table->buttonHtml(),
                 'datatable' => $table->html(),
                 'tableId' => $table->tableId(),
             ],

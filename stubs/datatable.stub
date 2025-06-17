@@ -65,16 +65,6 @@ class DummyClass extends DataTable
         return FALSE;
     }
 
-    public function printButtonSelector(): ?string
-    {
-        return NULL;
-    }
-
-    public function excelButtonSelector(): ?string
-    {
-        return NULL;
-    }
-
     public function exportTitle(): ?string
     {
         return NULL;
@@ -85,6 +75,11 @@ class DummyClass extends DataTable
         return [
 
         ];
+    }
+
+    public function buttonsTemplate(): string
+    {
+        return parent::buttonsTemplate();
     }
 
     public function totalableTemplate(): string

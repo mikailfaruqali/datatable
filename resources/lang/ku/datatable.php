@@ -11,4 +11,7 @@ return [
     "hich tomarek nadozrayawa" => "هیچ تۆمارێک نەدۆزرایەوە",
     "chawarwanba" => "چاوەڕوانبە ...",
     "load" => "ڕاکێشان",
+    "excel" => "ئێکسڵ",
+    "print" => "چاپ",
+    "toggle-columns" => "خانەکان",
 ];

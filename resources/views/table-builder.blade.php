@@ -1,9 +1,13 @@
 <table id="{{ $tableId }}" class="{{ config('snawbar-datatable.table-style') }} {{ $tableClass }}"></table>
 
 <script>
-const order = {{ datatable_print_html(datatable_when($isOrderable, json_encode($defaultOrderBy), '[]')) }};
-
 document.addEventListener('DOMContentLoaded', function () {
+    if (! $.fn.DataTable) {
+        return alert('Error: DataTable plugin not loaded');
+    }
+
+    const order = {{ datatable_print_html(datatable_when($isOrderable, json_encode($defaultOrderBy), '[]')) }};
+
     $('#{{ $tableId }}').DataTable({
         deferRender: true,
         serverSide: true,
@@ -72,8 +76,7 @@ function {{ $jsSafeTableId }}_createAnchorElement(attributes = {}) {
     const anchor = document.createElement('a');
 
     Object.entries(attributes).forEach(([key, value]) =>
-        key === 'onclick' && typeof value === 'function' ?
-        (anchor.onclick = value) : anchor.setAttribute(key, value)
+        key === 'onclick' && typeof value === 'function' ? (anchor.onclick = value) : anchor.setAttribute(key, value)
     );
 
     return anchor;
@@ -86,7 +89,9 @@ function {{ $jsSafeTableId }}_downloadFile(url, filename) {
     });
 
     $('body').append(anchor);
+
     anchor.click();
+
     $(anchor).remove();
 }
 
@@ -96,17 +101,17 @@ function {{ $jsSafeTableId }}_getTableCurrentUrl(extra = {}) {
     return `${table.ajax.url()}?${$.param(Object.assign({}, table.ajax.params(), extra))}`;
 }
 
-@if($printButtonSelector)
-    $(document).on('click', '{{ $printButtonSelector }}', function(e) {
-        window.open({{ $jsSafeTableId }}_getTableCurrentUrl({print: 1}), '_blank', 'width=4000,height=4000');
-    });
-@endif
+function {{ $buttonPrintFunction }} {
+    window.open({{ $jsSafeTableId }}_getTableCurrentUrl({print: 1}), '_blank', 'width=4000,height=4000');
+}
 
-@if($excelButtonSelector)
-    $(document).on('click', '{{ $excelButtonSelector }}', function(e) {
-        {{ $jsSafeTableId }}_downloadFile({{ $jsSafeTableId }}_getTableCurrentUrl({excel: 1}), '{{ $exportTitle }}');
-    });
-@endif
+function {{ $buttonExcelFunction }} {
+    {{ $jsSafeTableId }}_downloadFile({{ $jsSafeTableId }}_getTableCurrentUrl({excel: 1}), '{{ $exportTitle }}');
+}
+
+function {{ $buttonColumnVisibilityFunction }} {
+    alert('toogle column visibility');
+}
 
 function {{ $loadTotatableFunction }} {
     if ($(`meta[name='{{ $jsSafeTableId }}-table-totalable']`).length === 0) {
