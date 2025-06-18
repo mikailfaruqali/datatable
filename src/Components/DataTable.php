@@ -15,22 +15,20 @@ abstract class DataTable
 {
     protected Request $request;
 
+    private Builder $builder;
+
     private array $editColumns = [];
 
     private array $addColumns = [];
-
-    private Builder $builder;
 
     private array $hiddenColumns = [];
 
     public function __construct(Request $request)
     {
+        $this->request = $request;
         $this->builder = $this->query($request);
 
-        $this->request = $request;
-
         $this->setupColumns();
-
         $this->hiddenColumns = $this->getHiddenColumns();
     }
 
@@ -80,6 +78,18 @@ abstract class DataTable
         return NULL;
     }
 
+    public function setupColumns(): void {}
+
+    public function iteration(): bool
+    {
+        return FALSE;
+    }
+
+    public function totalableColumns(): ?array
+    {
+        return NULL;
+    }
+
     public function editColumn($column, $callback, $condition = NULL): self
     {
         $this->editColumns[$column] = function ($row) use ($callback, $condition) {
@@ -104,18 +114,6 @@ abstract class DataTable
         };
 
         return $this;
-    }
-
-    public function setupColumns(): void {}
-
-    public function iteration(): bool
-    {
-        return FALSE;
-    }
-
-    public function totalableColumns(): ?array
-    {
-        return NULL;
     }
 
     public function tableTotalableHtml(): ?string
@@ -174,17 +172,21 @@ abstract class DataTable
         ])->render();
     }
 
-    public function tableRedrawFunction(): string
+    public function buttonHtml(): ?string
     {
-        return sprintf('%s_redraw()', $this->jsSafeTableId());
+        if (! $this->hasToolbar()) {
+            return NULL;
+        }
+
+        return view('snawbar-datatable::toolbar.buttons', [
+            'exportableModalId' => $this->exportableModalId(),
+            'columnModalId' => $this->columnModalId(),
+            'buttonPrintFunction' => $this->buttonPrintFunction(),
+            'buttonExcelFunction' => $this->buttonExcelFunction(),
+        ])->render();
     }
 
-    public function jsSafeTableId(): string
-    {
-        return str_replace('-', '_', $this->tableId());
-    }
-
-    public function processColumns(): ?Collection
+    public function processColumns(): Collection
     {
         return collect($this->columns())
             ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
@@ -205,18 +207,14 @@ abstract class DataTable
             ]);
     }
 
-    public function buttonHtml(): ?string
+    public function tableRedrawFunction(): string
     {
-        if (! $this->hasToolbar()) {
-            return NULL;
-        }
+        return sprintf('%s_redraw()', $this->jsSafeTableId());
+    }
 
-        return view('snawbar-datatable::toolbar.buttons', [
-            'exportableModalId' => $this->exportableModalId(),
-            'columnModalId' => $this->columnModalId(),
-            'buttonPrintFunction' => $this->buttonPrintFunction(),
-            'buttonExcelFunction' => $this->buttonExcelFunction(),
-        ])->render();
+    public function jsSafeTableId(): string
+    {
+        return str_replace('-', '_', $this->tableId());
     }
 
     private function getHiddenColumns(): array
@@ -225,74 +223,6 @@ abstract class DataTable
             ->where('datatable', $this->jsSafeTableId())
             ->pluck('column')
             ->toArray();
-    }
-
-    private function exportableModalHtml(): ?string
-    {
-        if (! $this->hasToolbar()) {
-            return NULL;
-        }
-
-        $columns = $this->processColumns()
-            ->filter(fn ($column) => $column->exportable)
-            ->map(fn ($column) => (object) [
-                'data' => $column->data,
-                'title' => $column->title,
-                'checked' => ! in_array($column->data, $this->hiddenColumns),
-            ]);
-
-        if ($columns->isEmpty()) {
-            return NULL;
-        }
-
-        return view('snawbar-datatable::modal.exportable', [
-            'exportableModalId' => $this->exportableModalId(),
-            'columns' => $columns,
-        ])->render();
-    }
-
-    private function columnModalHtml(): ?string
-    {
-        if (! $this->hasToolbar()) {
-            return NULL;
-        }
-
-        $columns = collect($this->columns())
-            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
-            ->filter(fn ($column) => $this->shouldIncludeColumn($column))
-            ->map(fn ($column) => (object) [
-                'data' => $column->getData(),
-                'title' => $column->getTitle(),
-                'checked' => ! in_array($column->getData(), $this->hiddenColumns),
-            ]);
-
-        return view('snawbar-datatable::modal.column', [
-            'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
-            'columnModalId' => $this->columnModalId(),
-            'columns' => $columns,
-        ])->render();
-    }
-
-    private function shouldIncludeColumn($column): bool
-    {
-        if (blank($column->getData())) {
-            return FALSE;
-        }
-
-        $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
-
-        if ($evaluate($column->getVisible()) == FALSE) {
-            return FALSE;
-        }
-
-        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column->getExportable()) == FALSE);
-    }
-
-    private function filterByRequestedColumns($columns): Collection
-    {
-        $requestColumns = explode(',', $this->request->input('columns', ''));
-
-        return $columns->filter(fn ($column) => in_array($column->getData(), $requestColumns));
     }
 
     private function prepareRows(): Collection
@@ -369,6 +299,21 @@ abstract class DataTable
             ]);
     }
 
+    private function shouldIncludeColumn($column): bool
+    {
+        if (blank($column->getData())) {
+            return FALSE;
+        }
+
+        $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
+
+        if ($evaluate($column->getVisible()) == FALSE) {
+            return FALSE;
+        }
+
+        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column->getExportable()) == FALSE);
+    }
+
     private function shouldIncludeTotalableColumns($totalableColumn): bool
     {
         if (blank($totalableColumn->getColumn())) {
@@ -388,9 +333,11 @@ abstract class DataTable
         return TRUE;
     }
 
-    private function loadTotatableFunction(): string
+    private function filterByRequestedColumns($columns): Collection
     {
-        return sprintf('%s_loadTotalable()', $this->jsSafeTableId());
+        $requestColumns = explode(',', $this->request->input('columns', ''));
+
+        return $columns->filter(fn ($column) => in_array($column->getData(), $requestColumns));
     }
 
     private function buildSortClause(): string
@@ -420,6 +367,11 @@ abstract class DataTable
     private function shouldUseDefaultSort($column, $direction): bool
     {
         return blank($column) || ! in_array($direction, ['ASC', 'DESC']) || $column === 'iteration';
+    }
+
+    private function loadTotatableFunction(): string
+    {
+        return sprintf('%s_loadTotalable()', $this->jsSafeTableId());
     }
 
     private function defaultOrderByString(): string
@@ -455,5 +407,51 @@ abstract class DataTable
     private function columnModalId(): string
     {
         return sprintf('%s_column_modal', $this->jsSafeTableId());
+    }
+
+    private function exportableModalHtml(): ?string
+    {
+        if (! $this->hasToolbar()) {
+            return NULL;
+        }
+
+        $columns = $this->processColumns()
+            ->filter(fn ($column) => $column->exportable)
+            ->map(fn ($column) => (object) [
+                'data' => $column->data,
+                'title' => $column->title,
+                'checked' => ! in_array($column->data, $this->hiddenColumns),
+            ]);
+
+        if ($columns->isEmpty()) {
+            return NULL;
+        }
+
+        return view('snawbar-datatable::modal.exportable', [
+            'exportableModalId' => $this->exportableModalId(),
+            'columns' => $columns,
+        ])->render();
+    }
+
+    private function columnModalHtml(): ?string
+    {
+        if (! $this->hasToolbar()) {
+            return NULL;
+        }
+
+        $columns = collect($this->columns())
+            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
+            ->filter(fn ($column) => $this->shouldIncludeColumn($column))
+            ->map(fn ($column) => (object) [
+                'data' => $column->getData(),
+                'title' => $column->getTitle(),
+                'checked' => ! in_array($column->getData(), $this->hiddenColumns),
+            ]);
+
+        return view('snawbar-datatable::modal.column', [
+            'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
+            'columnModalId' => $this->columnModalId(),
+            'columns' => $columns,
+        ])->render();
     }
 }
