@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ session()->get('direction', 'ltr') }}">
+<html lang="{{ app()->getLocale() }}" dir="{{ session()->get('direction', 'rtl') }}">
 
 <head>
     <meta charset="UTF-8">
@@ -8,19 +8,19 @@
 
     <style>
         @font-face {
-            font-family: font;
-            src: url("{{ assetOrUrl(config('snawbar-datatable.font')) }}")
+            font-family: 'SnawbarFont';
+            src: url("{{ assetOrUrl(config('snawbar-datatable.font')) }}");
         }
 
         * {
-            font-family: font;
+            font-family: 'SnawbarFont';
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: center;
-            font-family: font;
+            font-family: 'SnawbarFont';
             font-size: 14px;
         }
 

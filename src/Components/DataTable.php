@@ -190,7 +190,7 @@ abstract class DataTable
             ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
             ->filter(fn ($column) => $this->shouldIncludeColumn($column) && ! in_array($column->getData(), $this->hiddenColumns))
             ->when($this->request->hasAny(['print', 'excel']), fn ($columns) => $this->filterByRequestedColumns($columns))
-            ->map(fn ($column) => [
+            ->map(fn ($column) => (object) [
                 'data' => $column->getData(),
                 'title' => $column->getTitle(),
                 'orderable' => $column->getOrderable(),
@@ -233,7 +233,13 @@ abstract class DataTable
             return NULL;
         }
 
-        $columns = $this->exportableColumns();
+        $columns = $this->processColumns()
+            ->filter(fn ($column) => $column->exportable)
+            ->map(fn ($column) => (object) [
+                'data' => $column->data,
+                'title' => $column->title,
+                'checked' => ! in_array($column->data, $this->hiddenColumns),
+            ]);
 
         if ($columns->isEmpty()) {
             return NULL;
@@ -254,7 +260,7 @@ abstract class DataTable
         $columns = collect($this->columns())
             ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
             ->filter(fn ($column) => $this->shouldIncludeColumn($column))
-            ->map(fn ($column) => [
+            ->map(fn ($column) => (object) [
                 'data' => $column->getData(),
                 'title' => $column->getTitle(),
                 'checked' => ! in_array($column->getData(), $this->hiddenColumns),
@@ -287,18 +293,6 @@ abstract class DataTable
         $requestColumns = explode(',', $this->request->input('columns', ''));
 
         return $columns->filter(fn ($column) => in_array($column->getData(), $requestColumns));
-    }
-
-    private function exportableColumns(): Collection
-    {
-        return $this->processColumns()
-            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
-            ->filter(fn ($column) => $column->getExportable())
-            ->map(fn ($column) => [
-                'data' => $column->getData(),
-                'title' => $column->getTitle(),
-                'checked' => ! in_array($column->getData(), $this->hiddenColumns),
-            ]);
     }
 
     private function prepareRows(): Collection
@@ -352,8 +346,8 @@ abstract class DataTable
 
                 return [
                     $alias => [
-                        'title' => $column['title'],
-                        'value' => $column['resolve']($value),
+                        'title' => $column->title,
+                        'value' => ($column->resolve)($value),
                     ],
                 ];
             })
@@ -367,7 +361,7 @@ abstract class DataTable
         return collect($this->totalableColumns())
             ->map(fn ($totalableColumn) => $totalableColumn instanceof Total ? $totalableColumn : Total::make($totalableColumn))
             ->filter(fn ($totalableColumn) => $this->shouldIncludeTotalableColumns($totalableColumn))
-            ->map(fn ($totalableColumn) => [
+            ->map(fn ($totalableColumn) => (object) [
                 'title' => $totalableColumn->getTitle(),
                 'alias' => $totalableColumn->getAlias(),
                 'raw' => $totalableColumn->rawExpression(),

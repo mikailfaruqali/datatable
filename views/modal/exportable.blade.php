@@ -9,9 +9,9 @@
                     @foreach($columns as $column)
                         <li class="list-group-item">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="{{ $column['data'] }}_exportable" name="columns[]" value="{{ $column['data'] }}" {{ datatableChecked($column['checked']) }}>
-                                <label class="custom-control-label" for="{{ $column['data'] }}_exportable">
-                                    {{ $column['title'] ?? $column['data'] }}
+                                <input type="checkbox" class="custom-control-input" id="{{ $column->data }}_exportable" name="columns[]" value="{{ $column->data }}" {{ datatableChecked($column->checked) }}>
+                                <label class="custom-control-label" for="{{ $column->data }}_exportable">
+                                    {{ $column->title }}
                                 </label>
                             </div>
                         </li>

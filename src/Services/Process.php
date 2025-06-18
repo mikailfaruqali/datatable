@@ -109,9 +109,7 @@ class Process
 
     private function exportColumns($datatable)
     {
-        return $datatable->processColumns()
-            ->map(fn ($columns) => $columns + ['title' => $columns['title'] ?? $columns['data']])
-            ->pluck('title', 'data');
+        return $datatable->processColumns()->pluck('title', 'data');
     }
 
     private function mapDataKeysToTitles($rows, $columns): array
