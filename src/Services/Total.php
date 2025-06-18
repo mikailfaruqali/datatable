@@ -61,21 +61,19 @@ class Total
 
     public function getFormatter(): ?callable
     {
-        return $this->attributes['formatter'];
+        return $this->attributes['formatter'] ?? NULL;
     }
 
     public function relatedColumn($column = NULL): self
     {
-        $this->attributes['column'] = $column;
+        $this->attributes['related_column'] = $column;
 
         return $this;
     }
 
-    public function getRelatedColumn($flag = TRUE): self
+    public function getRelatedColumn(): ?string
     {
-        $this->attributes['column'] = $flag;
-
-        return $this;
+        return $this->attributes['related_column'] ?? NULL;
     }
 
     public function visible($flag = TRUE): self

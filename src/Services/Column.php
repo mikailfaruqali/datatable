@@ -6,11 +6,6 @@ class Column
 {
     protected array $attributes = [];
 
-    public function __get(string $key)
-    {
-        return $this->attributes[$key] ?? NULL;
-    }
-
     public static function make($column): self
     {
         return tap(new static, function ($instance) use ($column) {
@@ -32,7 +27,7 @@ class Column
 
     public function getTitle(): string
     {
-        return $this->attributes['title'] ?? $this->attributes['data'];
+        return $this->attributes['title'] ?? $this->getData();
     }
 
     public function orderable($flag = TRUE): self

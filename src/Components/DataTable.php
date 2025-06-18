@@ -13,11 +13,11 @@ use Snawbar\DataTable\Services\Total;
 
 abstract class DataTable
 {
+    public Collection $processColumns;
+
     protected Request $request;
 
     protected Collection $processColumnInstance;
-
-    protected Collection $processColumns;
 
     protected Collection $processTotalableColumns;
 
