@@ -1,10 +1,10 @@
 <?php
 
-use Snawbar\DataTable\Services\DatatableProcess;
+use Snawbar\DataTable\Services\Process;
 
-function datatableProcess($datatables): DatatableProcess
+function datatableProcess($datatables): Process
 {
-    return new DatatableProcess($datatables);
+    return new Process($datatables);
 }
 
 function assetOrUrl($path): ?string

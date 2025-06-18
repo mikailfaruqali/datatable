@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Snawbar\DataTable\Services\Column;
 use Snawbar\DataTable\Services\Total;
 
 abstract class DataTable
@@ -125,7 +126,7 @@ abstract class DataTable
             return NULL;
         }
 
-        return view('snawbar-datatable::totalable-toolbar', [
+        return view('snawbar-datatable::totalable.index', [
             'loadTotatableFunction' => $this->loadTotatableFunction(),
             'columns' => $columns,
         ])->render();
@@ -148,7 +149,7 @@ abstract class DataTable
 
     public function html(): string
     {
-        return view('snawbar-datatable::table-builder', [
+        return view('snawbar-datatable::table.index', [
             'tableId' => $this->tableId(),
             'jsSafeTableId' => $this->jsSafeTableId(),
             'tableClass' => $this->tableClass(),
@@ -186,9 +187,22 @@ abstract class DataTable
     public function processColumns(): ?Collection
     {
         return collect($this->columns())
-            ->map(fn ($column) => is_array($column) ? $column : $column->toArray())
-            ->filter(fn ($column) => $this->shouldIncludeColumn($column) && ! in_array($column['data'], $this->hiddenColumns))
-            ->when($this->request->hasAny(['print', 'excel']), fn ($columns) => $this->filterByRequestedColumns($columns));
+            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
+            ->filter(fn ($column) => $this->shouldIncludeColumn($column) && ! in_array($column->getData(), $this->hiddenColumns))
+            ->when($this->request->hasAny(['print', 'excel']), fn ($columns) => $this->filterByRequestedColumns($columns))
+            ->map(fn ($column) => [
+                'data' => $column->getData(),
+                'title' => $column->getTitle(),
+                'orderable' => $column->getOrderable(),
+                'exportable' => $column->getExportable(),
+                'visible' => $column->getVisible(),
+                'className' => $column->getClassName(),
+                'width' => $column->getWidth(),
+                'render' => $column->getRender(),
+                'defaultContent' => $column->getDefaultContent(),
+                'name' => $column->getName(),
+                'responsivePriority' => $column->getResponsivePriority(),
+            ]);
     }
 
     public function buttonHtml(): ?string
@@ -197,7 +211,7 @@ abstract class DataTable
             return NULL;
         }
 
-        return view('snawbar-datatable::buttons-toolbar', [
+        return view('snawbar-datatable::toolbar.buttons', [
             'exportableModalId' => $this->exportableModalId(),
             'columnModalId' => $this->columnModalId(),
             'buttonPrintFunction' => $this->buttonPrintFunction(),
@@ -225,7 +239,7 @@ abstract class DataTable
             return NULL;
         }
 
-        return view('snawbar-datatable::exportable-modal', [
+        return view('snawbar-datatable::modal.exportable', [
             'exportableModalId' => $this->exportableModalId(),
             'columns' => $columns,
         ])->render();
@@ -238,15 +252,15 @@ abstract class DataTable
         }
 
         $columns = collect($this->columns())
-            ->map(fn ($column) => is_array($column) ? $column : $column->toArray())
+            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
             ->filter(fn ($column) => $this->shouldIncludeColumn($column))
             ->map(fn ($column) => [
-                'data' => $column['data'],
-                'title' => $column['title'] ?? $column['data'],
-                'checked' => ! in_array($column['data'], $this->hiddenColumns),
+                'data' => $column->getData(),
+                'title' => $column->getTitle(),
+                'checked' => ! in_array($column->getData(), $this->hiddenColumns),
             ]);
 
-        return view('snawbar-datatable::column-modal', [
+        return view('snawbar-datatable::modal.column', [
             'buttonColumnVisibilityFunction' => $this->buttonColumnVisibilityFunction(),
             'columnModalId' => $this->columnModalId(),
             'columns' => $columns,
@@ -255,34 +269,35 @@ abstract class DataTable
 
     private function shouldIncludeColumn($column): bool
     {
-        if (blank($column['data'])) {
+        if (blank($column->getData())) {
             return FALSE;
         }
 
         $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
 
-        if ($evaluate($column['visible'] ?? TRUE) == FALSE) {
+        if ($evaluate($column->getVisible()) == FALSE) {
             return FALSE;
         }
 
-        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column['exportable'] ?? TRUE) == FALSE);
+        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column->getExportable()) == FALSE);
     }
 
     private function filterByRequestedColumns($columns): Collection
     {
         $requestColumns = explode(',', $this->request->input('columns', ''));
 
-        return $columns->filter(fn ($column) => in_array($column['data'], $requestColumns));
+        return $columns->filter(fn ($column) => in_array($column->getData(), $requestColumns));
     }
 
     private function exportableColumns(): Collection
     {
         return $this->processColumns()
-            ->filter(fn ($column) => $column['exportable'] ?? TRUE)
+            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
+            ->filter(fn ($column) => $column->getExportable())
             ->map(fn ($column) => [
-                'data' => $column['data'],
-                'title' => $column['title'] ?? $column['data'],
-                'checked' => ! in_array($column['data'], $this->hiddenColumns),
+                'data' => $column->getData(),
+                'title' => $column->getTitle(),
+                'checked' => ! in_array($column->getData(), $this->hiddenColumns),
             ]);
     }
 
@@ -356,7 +371,7 @@ abstract class DataTable
                 'title' => $totalableColumn->getTitle(),
                 'alias' => $totalableColumn->getAlias(),
                 'raw' => $totalableColumn->rawExpression(),
-                'resolve' => fn ($value) => $totalableColumn->getFormmater() ? $totalableColumn->getFormmater()($value) : $value,
+                'resolve' => fn ($value) => $totalableColumn->getFormatter() ? $totalableColumn->getFormatter()($value) : $value,
             ]);
     }
 

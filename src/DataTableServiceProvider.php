@@ -17,8 +17,8 @@ class DataTableServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/datatable.php', 'snawbar-datatable');
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'snawbar-datatable');
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'snawbar-datatable');
+        $this->loadTranslationsFrom(__DIR__ . '/../lang', 'snawbar-datatable');
+        $this->loadViewsFrom(__DIR__ . '/../views', 'snawbar-datatable');
         $this->loadMigrationsFrom(__DIR__ . '/../migrations');
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
 
@@ -32,8 +32,8 @@ class DataTableServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/datatable.php' => config_path('snawbar-datatable.php'),
-                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/snawbar-datatable'),
-                __DIR__ . '/../resources/views' => resource_path('views/vendor/snawbar-datatable'),
+                __DIR__ . '/../lang' => resource_path('lang/vendor/snawbar-datatable'),
+                __DIR__ . '/../views' => resource_path('views/vendor/snawbar-datatable'),
             ], 'snawbar-datatable-assets');
         }
     }

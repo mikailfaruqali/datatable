@@ -6,9 +6,21 @@ class Column
 {
     protected array $attributes = [];
 
-    public static function make($data): self
+    public function __get(string $key)
     {
-        return tap(new static, fn ($column) => $column->attributes += ['data' => $data, 'name' => $data]);
+        return $this->attributes[$key] ?? NULL;
+    }
+
+    public static function make($column): self
+    {
+        return tap(new static, function ($instance) use ($column) {
+            $instance->attributes += is_array($column) ? $column : ['data' => $column, 'title' => $column];
+        });
+    }
+
+    public function getData(): string
+    {
+        return $this->attributes['data'];
     }
 
     public function title($title): self
@@ -18,6 +30,11 @@ class Column
         return $this;
     }
 
+    public function getTitle(): string
+    {
+        return $this->attributes['title'] ?? $this->attributes['data'];
+    }
+
     public function orderable($flag = TRUE): self
     {
         $this->attributes['orderable'] = $flag;
@@ -25,11 +42,9 @@ class Column
         return $this;
     }
 
-    public function searchable($flag = TRUE): self
+    public function getOrderable(): string
     {
-        $this->attributes['searchable'] = $flag;
-
-        return $this;
+        return $this->attributes['orderable'] ?? TRUE;
     }
 
     public function exportable($flag = TRUE): self
@@ -39,11 +54,21 @@ class Column
         return $this;
     }
 
+    public function getExportable(): string
+    {
+        return $this->attributes['exportable'] ?? TRUE;
+    }
+
     public function visible($flag = TRUE): self
     {
         $this->attributes['visible'] = $flag;
 
         return $this;
+    }
+
+    public function getVisible(): string
+    {
+        return $this->attributes['visible'] ?? TRUE;
     }
 
     public function className($class): self
@@ -53,11 +78,21 @@ class Column
         return $this;
     }
 
+    public function getClassName(): ?string
+    {
+        return $this->attributes['className'] ?? NULL;
+    }
+
     public function width($width): self
     {
         $this->attributes['width'] = $width;
 
         return $this;
+    }
+
+    public function getWidth(): ?string
+    {
+        return $this->attributes['width'] ?? NULL;
     }
 
     public function render($jsFunction): self
@@ -67,11 +102,21 @@ class Column
         return $this;
     }
 
+    public function getRender(): ?string
+    {
+        return $this->attributes['render'] ?? NULL;
+    }
+
     public function defaultContent($value): self
     {
         $this->attributes['defaultContent'] = $value;
 
         return $this;
+    }
+
+    public function getDefaultContent(): ?string
+    {
+        return $this->attributes['defaultContent'] ?? NULL;
     }
 
     public function name($name): self
@@ -81,11 +126,21 @@ class Column
         return $this;
     }
 
+    public function getName(): ?string
+    {
+        return $this->attributes['name'] ?? NULL;
+    }
+
     public function responsivePriority($priority): self
     {
         $this->attributes['responsivePriority'] = $priority;
 
         return $this;
+    }
+
+    public function getResponsivePriority(): ?int
+    {
+        return $this->attributes['responsivePriority'] ?? NULL;
     }
 
     public function toArray(): array

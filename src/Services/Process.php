@@ -6,7 +6,7 @@ use Exception;
 use Maatwebsite\Excel\Facades\Excel;
 use Snawbar\DataTable\Export\Exportable;
 
-class DatatableProcess
+class Process
 {
     private array $tables = [];
 
@@ -78,7 +78,7 @@ class DatatableProcess
         $exportColumns = $this->exportColumns($datatable);
         $responseData = $this->exportData($datatable);
 
-        return view('snawbar-datatable::print', [
+        return view('snawbar-datatable::export.print', [
             'rows' => $this->exportDataForColumns($responseData->data, $exportColumns),
             'headers' => $this->getExportHeaders($exportColumns),
             'title' => $datatable->exportTitle(),

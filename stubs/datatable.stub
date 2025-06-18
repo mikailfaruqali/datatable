@@ -20,29 +20,19 @@ class DummyClass extends DataTable
         ];
     }
 
-    public function setupColumns(): void
-    {
-        //
-    }
-
     public function tableId(): string
     {
         return 'dummy-table';
     }
 
+    public function setupColumns(): void
+    {
+        //
+    }
+
     public function iteration(): bool
     {
         return FALSE;
-    }
-
-    public function filterContainer(): ?string
-    {
-        return NULL;
-    }
-
-    public function tableClass(): ?string
-    {
-        return NULL;
     }
 
     public function isOrderable(): bool
@@ -67,7 +57,7 @@ class DummyClass extends DataTable
 
     public function hasToolbar(): bool
     {
-        return true;
+        return TRUE;
     }
 
     public function exportTitle(): ?string
@@ -80,5 +70,15 @@ class DummyClass extends DataTable
         return [
 
         ];
+    }
+
+    public function filterContainer(): ?string
+    {
+        return NULL;
+    }
+
+    public function tableClass(): ?string
+    {
+        return NULL;
     }
 }

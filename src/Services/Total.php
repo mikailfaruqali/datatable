@@ -11,10 +11,9 @@ class Total
 
     public static function make($column): self
     {
-        return tap(new static, fn ($instance) => $instance->attributes += [
-            'column' => $column,
-            'alias' => $column,
-        ]);
+        return tap(new static, function ($instance) use ($column) {
+            $instance->attributes += is_array($column) ? $column : ['column' => $column, 'alias' => $column];
+        });
     }
 
     public function column($column): self
@@ -24,11 +23,21 @@ class Total
         return $this;
     }
 
+    public function getColumn(): string
+    {
+        return $this->attributes['column'];
+    }
+
     public function alias($alias): self
     {
         $this->attributes['alias'] = $alias;
 
         return $this;
+    }
+
+    public function getAlias(): string
+    {
+        return $this->attributes['alias'] ?? $this->getColumn();
     }
 
     public function title($title): self
@@ -38,6 +47,11 @@ class Total
         return $this;
     }
 
+    public function getTitle(): string
+    {
+        return $this->attributes['title'] ?? $this->getColumn();
+    }
+
     public function formatUsing($callback = NULL): self
     {
         $this->attributes['formatter'] = $callback;
@@ -45,9 +59,21 @@ class Total
         return $this;
     }
 
+    public function getFormatter(): ?callable
+    {
+        return $this->attributes['formatter'];
+    }
+
     public function relatedColumn($column = NULL): self
     {
         $this->attributes['column'] = $column;
+
+        return $this;
+    }
+
+    public function getRelatedColumn($flag = TRUE): self
+    {
+        $this->attributes['orderable'] = $flag;
 
         return $this;
     }
@@ -59,34 +85,14 @@ class Total
         return $this;
     }
 
-    public function getColumn(): string
+    public function getVisible(): bool
     {
-        return $this->attributes['key'] ?? $this->attributes['column'];
-    }
-
-    public function getAlias(): string
-    {
-        return $this->attributes['alias'] ?? $this->getColumn();
-    }
-
-    public function getTitle(): string
-    {
-        return $this->attributes['title'] ?? $this->getColumn();
+        return $this->attributes['visible'] ?? TRUE;
     }
 
     public function rawExpression(): Expression
     {
         return DB::raw(sprintf('SUM(%s) as %s', $this->getColumn(), $this->getAlias()));
-    }
-
-    public function getVisible()
-    {
-        return $this->attributes['visible'] ?? TRUE;
-    }
-
-    public function getFormmater(): ?callable
-    {
-        return $this->attributes['formatter'] ?? NULL;
     }
 
     public function toArray(): array
