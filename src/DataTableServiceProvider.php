@@ -10,7 +10,7 @@ class DataTableServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        $this->macros();
+        $this->directives();
         $this->publishAssets();
     }
 
@@ -38,8 +38,28 @@ class DataTableServiceProvider extends ServiceProvider
         }
     }
 
-    private function macros()
+    private function directives()
     {
         Blade::directive('datatableRowSpace', fn ($expression) => str_repeat('<tr><td colspan="100%" class="border-none"></td></tr>', $expression));
+
+        Blade::directive('datatableCss', fn () => "<?php
+            \$links = [];
+
+            foreach (config('snawbar-datatable.css', []) as \$url) {
+                \$links[] = sprintf('<link href=\"%s\" rel=\"stylesheet\">', e(assetOrUrl(\$url)));
+            }
+
+            echo implode(\"\\n\", \$links);
+        ?>");
+
+        Blade::directive('datatableJs', fn () => "<?php
+            \$scripts = [];
+
+            foreach (config('snawbar-datatable.js', []) as \$url) {
+                \$scripts[] = sprintf('<script src=\"%s\"></script>', e(assetOrUrl(\$url)));
+            }
+
+            echo implode(\"\\n\", \$scripts);
+        ?>");
     }
 }

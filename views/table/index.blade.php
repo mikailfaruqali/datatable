@@ -6,7 +6,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     if (! $.fn.DataTable) {
-        return alert('Error: DataTable plugin not loaded');
+        return alert(`Error: DataTable plugin not loaded. Please install it from https://datatables.net`);
     }
 
     const order = {{ datatablePrintHtml(datatableWhen($isOrderable, json_encode($defaultOrderBy), '[]')) }};
