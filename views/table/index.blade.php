@@ -162,7 +162,7 @@ function {{ $loadTotatableFunction }} {
 
 $(document).on('click', '.datatable-button-export', function () {
     $('#{{ $exportableModalId }}_title').text($(this).data('modal-header-text'));
-    $('#{{ $exportableModalId }}_submit').attr('onclick', $(this).data('function-export')).text($(this).text());
+    $('#{{ $exportableModalId }}_submit').attr('onclick', $(this).data('function-export')).text($(this).data('button-text'));
 });
 
 $(document).on('click', '#{{ $exportableModalId }}_submit', function () {
