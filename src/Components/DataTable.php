@@ -15,6 +15,12 @@ abstract class DataTable
 {
     protected Request $request;
 
+    protected Collection $processColumnInstance;
+
+    protected Collection $processColumns;
+
+    protected Collection $processTotalableColumns;
+
     private Builder $builder;
 
     private array $editColumns = [];
@@ -26,10 +32,18 @@ abstract class DataTable
     public function __construct(Request $request)
     {
         $this->request = $request;
+
         $this->builder = $this->query($request);
 
         $this->setupColumns();
+
         $this->hiddenColumns = $this->getHiddenColumns();
+
+        $this->processColumnInstance = $this->processColumnInstance();
+
+        $this->processColumns = $this->processColumns();
+
+        $this->processTotalableColumns = $this->processTotalableColumns();
     }
 
     abstract protected function query(Request $request): Builder;
@@ -118,7 +132,7 @@ abstract class DataTable
 
     public function tableTotalableHtml(): ?string
     {
-        $columns = $this->processTotalableColumns();
+        $columns = $this->processTotalableColumns;
 
         if ($columns->isEmpty()) {
             return NULL;
@@ -155,7 +169,7 @@ abstract class DataTable
             'defaultOrderBy' => $this->defaultOrderBy(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
-            'columns' => $this->processColumns()->values()->toJson(),
+            'columns' => $this->processColumns->values()->toJson(),
             'ajaxUrl' => $this->request->fullUrl(),
             'tableRedrawFunction' => $this->tableRedrawFunction(),
             'loadTotatableFunction' => $this->loadTotatableFunction(),
@@ -188,8 +202,7 @@ abstract class DataTable
 
     public function processColumns(): Collection
     {
-        return collect($this->columns())
-            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
+        return $this->processColumnInstance
             ->filter(fn ($column) => $this->shouldIncludeColumn($column) && ! in_array($column->getData(), $this->hiddenColumns))
             ->when($this->request->hasAny(['print', 'excel']), fn ($columns) => $this->filterByRequestedColumns($columns))
             ->map(fn ($column) => (object) [
@@ -215,6 +228,11 @@ abstract class DataTable
     public function jsSafeTableId(): string
     {
         return str_replace('-', '_', $this->tableId());
+    }
+
+    private function processColumnInstance(): Collection
+    {
+        return collect($this->columns())->map(fn ($column) => $column instanceof Column ? $column : Column::make($column));
     }
 
     private function getHiddenColumns(): array
@@ -256,7 +274,7 @@ abstract class DataTable
 
     private function prepareAggregateQuery(): array
     {
-        $totalableColumns = $this->processTotalableColumns();
+        $totalableColumns = $this->processTotalableColumns;
 
         $aggregateQuery = DB::query()
             ->fromSub($this->builder, 'totals')
@@ -326,8 +344,8 @@ abstract class DataTable
             return FALSE;
         }
 
-        if ($totalableColumn->getColumn()) {
-            return $this->processColumns()->pluck('data')->contains($totalableColumn->getColumn());
+        if ($totalableColumn->getRelatedColumn()) {
+            return $this->processColumns->pluck('data')->contains($totalableColumn->getRelatedColumn());
         }
 
         return TRUE;
@@ -415,7 +433,7 @@ abstract class DataTable
             return NULL;
         }
 
-        $columns = $this->processColumns()
+        $columns = $this->processColumns
             ->filter(fn ($column) => $column->exportable)
             ->map(fn ($column) => (object) [
                 'data' => $column->data,
@@ -439,8 +457,7 @@ abstract class DataTable
             return NULL;
         }
 
-        $columns = collect($this->columns())
-            ->map(fn ($column) => $column instanceof Column ? $column : Column::make($column))
+        $columns = $this->processColumnInstance
             ->filter(fn ($column) => $this->shouldIncludeColumn($column))
             ->map(fn ($column) => (object) [
                 'data' => $column->getData(),

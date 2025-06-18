@@ -73,7 +73,7 @@ class Total
 
     public function getRelatedColumn($flag = TRUE): self
     {
-        $this->attributes['orderable'] = $flag;
+        $this->attributes['column'] = $flag;
 
         return $this;
     }

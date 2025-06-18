@@ -83,7 +83,7 @@ class Process
 
     private function exportColumns($datatable)
     {
-        return $datatable->processColumns()->pluck('title', 'data');
+        return $datatable->processColumns->pluck('title', 'data');
     }
 
     private function renderView($view = NULL, array $data = [])
