@@ -3,15 +3,12 @@
 namespace Snawbar\DataTable\Services;
 
 use Exception;
-use Illuminate\Support\Fluent;
 use Maatwebsite\Excel\Facades\Excel;
 use Snawbar\DataTable\Export\Exportable;
 
 class Process
 {
     private array $tables = [];
-
-    private array $attributes = [];
 
     public function __construct($datatableClassesOrInstances)
     {
@@ -29,14 +26,14 @@ class Process
 
     public function with(array $attributes): self
     {
-        $this->attributes = array_merge($this->attributes, $attributes);
+        array_map(fn ($table) => $table->setAttributes($attributes), $this->tables);
 
         return $this;
     }
 
     private function handleAjax()
     {
-        $datatable = collect($this->tables)->first(fn ($table) => $table->jsSafeTableId() === request('tableId'));
+        $datatable = collect($this->tables)->first(fn ($table) => $table->jsSafeTableId() === request('tableId'))->builder();
 
         if (request()->ajax()) {
             return $datatable->ajax();
@@ -118,18 +115,7 @@ class Process
 
     private function initializeTables($datatables): void
     {
-        $datatables = is_array($datatables) ? $datatables : [$datatables];
-
-        $this->tables = array_map([$this, 'makeDatatableInstance'], $datatables);
-    }
-
-    private function makeDatatableInstance($datatable)
-    {
-        $instance = $this->resolveDatatable($datatable, request());
-
-        $instance->attributes = new Fluent($this->attributes);
-
-        return $instance;
+        $this->tables = array_map(fn ($datatable) => $this->resolveDatatable($datatable, request()), is_array($datatables) ? $datatables : [$datatables]);
     }
 
     private function resolveDatatable($datatable, $request): object

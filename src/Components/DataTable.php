@@ -8,12 +8,15 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Fluent;
 use Snawbar\DataTable\Services\Column;
 use Snawbar\DataTable\Services\Total;
 
 abstract class DataTable
 {
     public Collection $processColumns;
+
+    public Fluent $attributes;
 
     protected Request $request;
 
@@ -33,8 +36,6 @@ abstract class DataTable
     {
         $this->request = $request;
 
-        $this->builder = $this->query($request);
-
         $this->setupColumns();
 
         $this->hiddenColumns = $this->getHiddenColumns();
@@ -51,6 +52,13 @@ abstract class DataTable
     abstract public function columns(): array;
 
     abstract public function tableId(): string;
+
+    public function builder(): self
+    {
+        $this->builder = $this->query($this->request);
+
+        return $this;
+    }
 
     public function tableClass(): ?string
     {
@@ -102,6 +110,13 @@ abstract class DataTable
     public function totalableColumns(): ?array
     {
         return NULL;
+    }
+
+    public function setAttributes(array $attributes): self
+    {
+        $this->attributes = new Fluent($attributes);
+
+        return $this;
     }
 
     public function editColumn($column, $callback, $condition = NULL): self
