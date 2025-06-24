@@ -3,12 +3,15 @@
 namespace Snawbar\DataTable\Services;
 
 use Exception;
+use Illuminate\Support\Fluent;
 use Maatwebsite\Excel\Facades\Excel;
 use Snawbar\DataTable\Export\Exportable;
 
 class Process
 {
     private array $tables = [];
+
+    private array $attributes = [];
 
     public function __construct($datatableClassesOrInstances)
     {
@@ -22,6 +25,13 @@ class Process
         }
 
         return $this->renderView($view, $data);
+    }
+
+    public function with(array $attributes): self
+    {
+        $this->attributes = array_merge($this->attributes, $attributes);
+
+        return $this;
     }
 
     private function handleAjax()
@@ -108,7 +118,18 @@ class Process
 
     private function initializeTables($datatables): void
     {
-        $this->tables = array_map(fn ($datatable) => $this->resolveDatatable($datatable, request()), is_array($datatables) ? $datatables : [$datatables]);
+        $datatables = is_array($datatables) ? $datatables : [$datatables];
+
+        $this->tables = array_map([$this, 'makeDatatableInstance'], $datatables);
+    }
+
+    private function makeDatatableInstance($datatable)
+    {
+        $instance = $this->resolveDatatable($datatable, request());
+
+        $instance->attributes = new Fluent($this->attributes);
+
+        return $instance;
     }
 
     private function resolveDatatable($datatable, $request): object
