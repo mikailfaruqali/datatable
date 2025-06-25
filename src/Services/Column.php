@@ -90,18 +90,6 @@ class Column
         return $this->attributes['width'] ?? NULL;
     }
 
-    public function render($jsFunction): self
-    {
-        $this->attributes['render'] = $jsFunction;
-
-        return $this;
-    }
-
-    public function getRender(): ?string
-    {
-        return $this->attributes['render'] ?? NULL;
-    }
-
     public function defaultContent($value): self
     {
         $this->attributes['defaultContent'] = $value;
