@@ -410,7 +410,9 @@ abstract class DataTable
 
     private function callbackJs(): ?string
     {
-        return implode(", \n", array_map(fn ($name, $js) => sprintf('%s: %s,', $name, $js), array_keys($this->callbacks()), $this->callbacks()));
+        $callbacks = $this->callbacks() ?: [];
+
+        return implode(", \n", array_map(fn ($name, $js) => sprintf('%s: %s,', $name, $js), array_keys($callbacks), $callbacks));
     }
 
     private function loadTotatableFunction(): string
