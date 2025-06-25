@@ -81,4 +81,9 @@ class DummyClass extends DataTable
     {
         return NULL;
     }
+
+    public function callbacks(): ?array
+    {
+        return NULL;
+    }
 }

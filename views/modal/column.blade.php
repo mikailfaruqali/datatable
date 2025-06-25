@@ -12,7 +12,7 @@
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input" id="{{ $column->data }}_visiblity" name="columns[]" value="{{ $column->data }}" {{ datatableChecked($column->checked) }}>
                                     <label class="custom-control-label" for="{{ $column->data }}_visiblity">
-                                        {{ $column->title }}
+                                        {{ datatablePrintHtml($column->title) }}
                                     </label>
                                 </div>
                             </li>

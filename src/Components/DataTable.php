@@ -112,6 +112,11 @@ abstract class DataTable
         return NULL;
     }
 
+    public function callbacks(): ?array
+    {
+        return NULL;
+    }
+
     public function setAttributes(array $attributes): self
     {
         $this->attributes = new Fluent($attributes);
@@ -182,6 +187,7 @@ abstract class DataTable
             'tableClass' => $this->tableClass(),
             'isOrderable' => $this->isOrderable(),
             'defaultOrderBy' => $this->defaultOrderBy(),
+            'callbackJs' => $this->callbackJs(),
             'length' => $this->length(),
             'shouldJumpToLastPage' => $this->shouldJumpToLastPage(),
             'columns' => $this->processColumns->values()->toJson(),
@@ -400,6 +406,11 @@ abstract class DataTable
     private function shouldUseDefaultSort($column, $direction): bool
     {
         return blank($column) || ! in_array($direction, ['ASC', 'DESC']) || $column === 'iteration';
+    }
+
+    private function callbackJs(): ?string
+    {
+        return implode(", \n", array_map(fn ($name, $js) => sprintf('%s: %s', $name, $js), array_keys($this->callbacks()), $this->callbacks()));
     }
 
     private function loadTotatableFunction(): string

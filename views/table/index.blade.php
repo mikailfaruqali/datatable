@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
         },
         columns: {{ datatablePrintHtml($columns) }},
+        {{ datatablePrintHtml($callbackJs) }},
     });
 });
 

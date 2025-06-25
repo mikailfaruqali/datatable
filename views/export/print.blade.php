@@ -74,7 +74,7 @@
         <thead class="thead-dark">
             <tr>
                 @foreach ($headers as $header)
-                    <th>{{ $header }}</th>
+                    <th>{{ datatablePrintHtml($header) }}</th>
                 @endforeach
             </tr>
         </thead>
