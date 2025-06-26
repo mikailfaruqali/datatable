@@ -234,7 +234,6 @@ abstract class DataTable
                 'visible' => $column->getVisible(),
                 'className' => $column->getClassName(),
                 'width' => $column->getWidth(),
-                'render' => $column->getRender(),
                 'defaultContent' => $column->getDefaultContent(),
                 'name' => $column->getName(),
                 'responsivePriority' => $column->getResponsivePriority(),
