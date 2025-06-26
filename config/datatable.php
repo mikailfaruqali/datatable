@@ -34,7 +34,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'css' => [
+    'datatable-css' => [
         //
     ],
 
@@ -44,7 +44,22 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'js' => [
+    'datatable-js' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Print View CSS (Used for window.print())
+    |--------------------------------------------------------------------------
+    |
+    | These styles will be injected when printing the DataTable using the
+    | print button. Add any external stylesheets or inline CSS that
+    | should be applied to the print version of the table.
+    |
+    */
+
+    'datatable-print-css' => [
         //
     ],
 ];

@@ -45,7 +45,7 @@ class DataTableServiceProvider extends ServiceProvider
         Blade::directive('datatableCss', fn () => "<?php
             \$links = [];
 
-            foreach (config('snawbar-datatable.css', []) as \$url) {
+            foreach (config('snawbar-datatable.datatable-css', []) as \$url) {
                 \$links[] = sprintf('<link href=\"%s\" rel=\"stylesheet\">', e(assetOrUrl(\$url)));
             }
 
@@ -55,11 +55,21 @@ class DataTableServiceProvider extends ServiceProvider
         Blade::directive('datatableJs', fn () => "<?php
             \$scripts = [];
 
-            foreach (config('snawbar-datatable.js', []) as \$url) {
+            foreach (config('snawbar-datatable.datatable-js', []) as \$url) {
                 \$scripts[] = sprintf('<script src=\"%s\"></script>', e(assetOrUrl(\$url)));
             }
 
             echo implode(\"\\n\", \$scripts);
+        ?>");
+
+        Blade::directive('datatablePrintCss', fn () => "<?php
+            \$links = [];
+
+            foreach (config('snawbar-datatable.datatable-print-css', []) as \$url) {
+                \$links[] = sprintf('<link href=\"%s\" rel=\"stylesheet\">', e(assetOrUrl(\$url)));
+            }
+
+            echo implode(\"\\n\", \$links);
         ?>");
     }
 }
