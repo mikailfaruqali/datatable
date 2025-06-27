@@ -10,7 +10,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
 use Snawbar\DataTable\Services\Column;
-use Snawbar\DataTable\Services\ColumnStyle;
 use Snawbar\DataTable\Services\Total;
 
 abstract class DataTable
@@ -221,10 +220,6 @@ abstract class DataTable
                 'orderable' => $column->getOrderable(),
                 'exportable' => $column->getExportable(),
                 'visible' => $column->getVisible(),
-                'className' => $column->getClassName(),
-                'width' => $column->getWidth(),
-                'defaultContent' => $column->getDefaultContent(),
-                'name' => $column->getName(),
                 'responsivePriority' => $column->getResponsivePriority(),
             ]);
     }
@@ -496,7 +491,7 @@ abstract class DataTable
 
         $result = $callback($row);
 
-        if ($result instanceof ColumnStyle || $result instanceof View) {
+        if ($result instanceof View) {
             return $result->render();
         }
 
