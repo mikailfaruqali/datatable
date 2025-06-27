@@ -66,54 +66,6 @@ class Column
         return $this->attributes['visible'] ?? TRUE;
     }
 
-    public function className($class): self
-    {
-        $this->attributes['className'] = $class;
-
-        return $this;
-    }
-
-    public function getClassName(): ?string
-    {
-        return $this->attributes['className'] ?? NULL;
-    }
-
-    public function width($width): self
-    {
-        $this->attributes['width'] = $width;
-
-        return $this;
-    }
-
-    public function getWidth(): ?string
-    {
-        return $this->attributes['width'] ?? NULL;
-    }
-
-    public function defaultContent($value): self
-    {
-        $this->attributes['defaultContent'] = $value;
-
-        return $this;
-    }
-
-    public function getDefaultContent(): ?string
-    {
-        return $this->attributes['defaultContent'] ?? NULL;
-    }
-
-    public function name($name): self
-    {
-        $this->attributes['name'] = $name;
-
-        return $this;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->attributes['name'] ?? NULL;
-    }
-
     public function responsivePriority($priority): self
     {
         $this->attributes['responsivePriority'] = $priority;

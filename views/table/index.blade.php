@@ -1,3 +1,12 @@
+<style>
+    #{{ $tableId }} .fill-column-area {
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        box-sizing: border-box !important;
+    }
+</style>
+
 <table id="{{ $tableId }}" class="{{ config('snawbar-datatable.table-style') }} {{ $tableClass }}"></table>
 
 {{ datatablePrintHtml($exportableModalHtml) }}

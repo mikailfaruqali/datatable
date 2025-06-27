@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
 use Snawbar\DataTable\Services\Column;
+use Snawbar\DataTable\Services\ColumnStyle;
 use Snawbar\DataTable\Services\Total;
 
 abstract class DataTable
@@ -126,26 +127,14 @@ abstract class DataTable
 
     public function editColumn($column, $callback, $condition = NULL): self
     {
-        $this->editColumns[$column] = function ($row) use ($callback, $condition) {
-            if (is_callable($condition) && $condition($row) == FALSE) {
-                return NULL;
-            }
-
-            return ($result = $callback($row)) instanceof View ? $result->render() : $result;
-        };
+        $this->editColumns[$column] = fn ($row) => $this->resolveColumnCallback($callback, $condition, $row);
 
         return $this;
     }
 
     public function addColumn($column, $callback, $condition = NULL): self
     {
-        $this->addColumns[$column] = function ($row) use ($callback, $condition) {
-            if (is_callable($condition) && $condition($row) == FALSE) {
-                return NULL;
-            }
-
-            return ($result = $callback($row)) instanceof View ? $result->render() : $result;
-        };
+        $this->addColumns[$column] = fn ($row) => $this->resolveColumnCallback($callback, $condition, $row);
 
         return $this;
     }
@@ -497,5 +486,20 @@ abstract class DataTable
             'columnModalId' => $this->columnModalId(),
             'columns' => $columns,
         ])->render();
+    }
+
+    private function resolveColumnCallback($callback, $condition, $row)
+    {
+        if (is_callable($condition) && ! $condition($row)) {
+            return NULL;
+        }
+
+        $result = $callback($row);
+
+        if ($result instanceof ColumnStyle || $result instanceof View) {
+            return $result->render();
+        }
+
+        return $result;
     }
 }
