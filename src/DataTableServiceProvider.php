@@ -2,6 +2,7 @@
 
 namespace Snawbar\DataTable;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Snawbar\DataTable\Console\MakeDataTableCommand;
@@ -12,6 +13,7 @@ class DataTableServiceProvider extends ServiceProvider
     {
         $this->directives();
         $this->publishAssets();
+        $this->macros();
     }
 
     public function register()
@@ -25,6 +27,13 @@ class DataTableServiceProvider extends ServiceProvider
         $this->commands([
             MakeDataTableCommand::class,
         ]);
+    }
+
+    private function macros()
+    {
+        Request::macro('isAjaxDatatable', function () {
+            return $this->has('draw');
+        });
     }
 
     private function publishAssets()
