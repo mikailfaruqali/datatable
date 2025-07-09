@@ -78,6 +78,18 @@ class Column
         return $this->attributes['responsivePriority'] ?? NULL;
     }
 
+    public function className($class): self
+    {
+        $this->attributes['className'] = $class;
+
+        return $this;
+    }
+
+    public function getClassName(): ?string
+    {
+        return $this->attributes['className'] ?? NULL;
+    }
+
     public function toArray(): array
     {
         return $this->attributes;

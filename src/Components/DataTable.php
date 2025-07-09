@@ -221,6 +221,7 @@ abstract class DataTable
                 'exportable' => $column->getExportable(),
                 'visible' => $column->getVisible(),
                 'responsivePriority' => $column->getResponsivePriority(),
+                'className' => $column->getClassName(),
             ]);
     }
 
