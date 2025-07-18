@@ -32,3 +32,8 @@ function datatableChecked($condition): string
 {
     return $condition ? 'checked' : '';
 }
+
+function datatableNumberPatch($number): string
+{
+    return blank($number) ? '0' : (preg_replace('/[^0-9.-]/', '', (string) $number) ?? '0');
+}

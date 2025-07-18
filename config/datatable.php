@@ -1,6 +1,16 @@
 <?php
 
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Session Key for Direction
+    |--------------------------------------------------------------------------
+    |
+    | This key is used to store and retrieve the text direction (e.g., 'ltr' or 'rtl')
+    | in the session. It helps maintain consistent directionality across requests.
+    |
+    */
+    'local-direction-session-key' => 'direction',
 
     /*
     |--------------------------------------------------------------------------

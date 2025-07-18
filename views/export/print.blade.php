@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ session()->get('direction', 'rtl') }}">
+<html lang="{{ app()->getLocale() }}" dir="{{ session()->get(config('snawbar-datatable.local-direction-session-key', 'direction'), 'rtl') }}">
 
 <head>
     <meta charset="UTF-8">

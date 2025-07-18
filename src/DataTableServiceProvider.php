@@ -31,9 +31,7 @@ class DataTableServiceProvider extends ServiceProvider
 
     private function macros()
     {
-        Request::macro('isAjaxDatatable', function () {
-            return $this->has('draw');
-        });
+        Request::macro('isAjaxDatatable', fn () => $this->has('draw'));
     }
 
     private function publishAssets()

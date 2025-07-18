@@ -54,12 +54,16 @@ class Process
 
     private function handlePrintPage($datatable)
     {
-        $columns = $this->exportColumns($datatable);
-        $response = $this->exportData($datatable);
+        $headers = $datatable->processColumns->pluck('title', 'data');
+        $response = $datatable->ajax()->getData();
+
+        $rows = collect($response->data)
+            ->map(fn ($row) => $headers->mapWithKeys(fn ($title, $key) => [$title => $row->{$key}]))
+            ->toArray();
 
         return view('snawbar-datatable::export.print', [
-            'rows' => $this->mapDataToColumns($response->data, $columns),
-            'headers' => $columns->values()->all(),
+            'rows' => $rows,
+            'headers' => $headers->values()->all(),
             'title' => $datatable->exportTitle(),
             'totals' => (array) $response->totals,
         ]);
@@ -67,30 +71,21 @@ class Process
 
     private function handleExcelExport($datatable)
     {
-        $columns = $this->exportColumns($datatable);
-        $response = $this->exportData($datatable);
+        $columns = $datatable->processColumns;
+        $headers = $columns->pluck('title', 'data');
+        $response = $datatable->ajax()->getData();
+
+        $rows = collect($response->data)
+            ->map(fn ($row) => $columns->mapWithKeys(fn ($column) => [$column->title => $this->formatColumnType($column->type, $row->{$column->data})]))
+            ->toArray();
 
         return Excel::download(new Exportable(
-            $this->mapDataToColumns($response->data, $columns),
-            $columns->values()->all()
+            $rows,
+            $headers->values()->all(),
+            $columns->toArray(),
+            $datatable->exportTitle(),
+            $this->formatTotalsForExport((array) $response->totals),
         ), sprintf('%s.xlsx', $datatable->exportTitle()));
-    }
-
-    private function exportData($datatable)
-    {
-        return $datatable->ajax()->getData();
-    }
-
-    private function mapDataToColumns($data, $columns): array
-    {
-        return collect($data)
-            ->map(fn ($row) => $columns->mapWithKeys(fn ($title, $key) => [$title => $row->{$key}]))
-            ->toArray();
-    }
-
-    private function exportColumns($datatable)
-    {
-        return $datatable->processColumns->pluck('title', 'data');
     }
 
     private function renderView($view = NULL, array $data = [])
@@ -121,5 +116,21 @@ class Process
     private function resolveDatatable($datatable, $request): object
     {
         return is_string($datatable) && class_exists($datatable) ? new $datatable($request) : $datatable;
+    }
+
+    private function formatColumnType($type, $value): string
+    {
+        switch ($type) {
+            case 'number':
+            case 'float':
+                return datatableNumberPatch($value);
+            default:
+                return (string) $value;
+        }
+    }
+
+    private function formatTotalsForExport(array $totals): array
+    {
+        return array_combine(array_column($totals, 'title'), array_map(fn ($total) => datatableNumberPatch($total->value), $totals));
     }
 }

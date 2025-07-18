@@ -2,8 +2,14 @@
 
 namespace Snawbar\DataTable\Services;
 
+use InvalidArgumentException;
+
 class Column
 {
+    protected const ALLOWED_TYPES = [
+        'number', 'float',
+    ];
+
     protected array $attributes = [];
 
     public static function make($column): self
@@ -88,6 +94,20 @@ class Column
     public function getClassName(): ?string
     {
         return $this->attributes['className'] ?? NULL;
+    }
+
+    public function type(string $type): self
+    {
+        throw_unless(in_array($type, static::ALLOWED_TYPES), new InvalidArgumentException(sprintf('Invalid column type: %s', $type)));
+
+        $this->attributes['type'] = $type;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->attributes['type'] ?? NULL;
     }
 
     public function toArray(): array

@@ -222,6 +222,7 @@ abstract class DataTable
                 'visible' => $column->getVisible(),
                 'responsivePriority' => $column->getResponsivePriority(),
                 'className' => $column->getClassName(),
+                'type' => $column->getType(),
             ]);
     }
 
@@ -411,7 +412,7 @@ abstract class DataTable
 
     private function isTotalable(): bool
     {
-        return filled(request('totalable')) && (request()->ajax() || request()->has('print'));
+        return filled(request('totalable'));
     }
 
     private function buttonPrintFunction(): string
