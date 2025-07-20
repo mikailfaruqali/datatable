@@ -67,7 +67,7 @@ class Column
         return $this;
     }
 
-    public function getVisible(): string
+    public function getVisible()
     {
         return $this->attributes['visible'] ?? TRUE;
     }

@@ -83,7 +83,7 @@ class Total
         return $this;
     }
 
-    public function getVisible(): bool
+    public function getVisible()
     {
         return $this->attributes['visible'] ?? TRUE;
     }

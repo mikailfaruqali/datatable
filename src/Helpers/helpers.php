@@ -4,7 +4,7 @@ use Snawbar\DataTable\Services\Process;
 
 function datatableProcess($datatables): Process
 {
-    return new Process($datatables);
+    return new Process(request(), $datatables);
 }
 
 function assetOrUrl($path): ?string

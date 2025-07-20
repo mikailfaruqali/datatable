@@ -159,7 +159,7 @@ abstract class DataTable
         $rows = $this->prepareRows();
 
         return response()->json([
-            'draw' => request('draw', 1),
+            'draw' => $this->request->input('draw', 1),
             'recordsTotal' => $totalRecords,
             'recordsFiltered' => $totalRecords,
             'totals' => $aggregateQuery,
@@ -251,8 +251,8 @@ abstract class DataTable
 
     private function prepareRows(): Collection
     {
-        $start = request()->input('start', 0);
-        $length = request()->input('length', 10);
+        $start = $this->request->input('start', 0);
+        $length = $this->request->input('length', 10);
 
         $rows = $this->builder
             ->when($this->request->ajax(), fn ($query) => $query->skip($start)->take($length))
@@ -325,25 +325,17 @@ abstract class DataTable
 
     private function shouldIncludeColumn($column): bool
     {
-        if (blank($column->getData())) {
-            return FALSE;
-        }
-
         $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
 
         if ($evaluate($column->getVisible()) == FALSE) {
             return FALSE;
         }
 
-        return ! (request()->hasAny(['print', 'excel']) && $evaluate($column->getExportable()) == FALSE);
+        return ! ($this->request->hasAny(['print', 'excel']) && $evaluate($column->getExportable()) == FALSE);
     }
 
     private function shouldIncludeTotalableColumns($totalableColumn): bool
     {
-        if (blank($totalableColumn->getColumn())) {
-            return FALSE;
-        }
-
         $evaluate = fn ($value) => is_callable($value) ? $value() : $value;
 
         if ($evaluate($totalableColumn->getVisible()) == FALSE) {
@@ -412,7 +404,7 @@ abstract class DataTable
 
     private function isTotalable(): bool
     {
-        return filled(request('totalable'));
+        return filled($this->request->input('totalable'));
     }
 
     private function buttonPrintFunction(): string

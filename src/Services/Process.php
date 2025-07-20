@@ -3,21 +3,26 @@
 namespace Snawbar\DataTable\Services;
 
 use Exception;
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Snawbar\DataTable\Export\Exportable;
 
 class Process
 {
+    protected Request $request;
+
     private array $tables = [];
 
-    public function __construct($datatableClassesOrInstances)
+    public function __construct(Request $request, $datatableClassesOrInstances)
     {
+        $this->request = $request;
+
         $this->initializeTables($datatableClassesOrInstances);
     }
 
     public function view($view = NULL, array $data = [])
     {
-        if (request()->ajax() || request()->hasAny(['print', 'excel'])) {
+        if ($this->request->ajax() || $this->request->hasAny(['print', 'excel'])) {
             return $this->handleAjax();
         }
 
@@ -33,19 +38,19 @@ class Process
 
     private function handleAjax()
     {
-        $datatable = collect($this->tables)->first(fn ($table) => $table->jsSafeTableId() === request('tableId'))->builder();
+        $datatable = collect($this->tables)->first(fn ($table) => $table->jsSafeTableId() === $this->request->input('tableId'))->builder();
 
-        if (request()->ajax()) {
+        if ($this->request->ajax()) {
             return $datatable->ajax();
         }
 
         throw_if(blank($datatable->exportTitle()), new Exception('Export title is not set for the datatable'));
 
-        if (request()->has('print')) {
+        if ($this->request->has('print')) {
             return $this->handlePrintPage($datatable);
         }
 
-        if (request()->has('excel')) {
+        if ($this->request->has('excel')) {
             return $this->handleExcelExport($datatable);
         }
 
@@ -110,7 +115,7 @@ class Process
 
     private function initializeTables($datatables): void
     {
-        $this->tables = array_map(fn ($datatable) => $this->resolveDatatable($datatable, request()), is_array($datatables) ? $datatables : [$datatables]);
+        $this->tables = array_map(fn ($datatable) => $this->resolveDatatable($datatable, $this->request), is_array($datatables) ? $datatables : [$datatables]);
     }
 
     private function resolveDatatable($datatable, $request): object
