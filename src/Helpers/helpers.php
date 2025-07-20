@@ -38,11 +38,7 @@ function datatableNumberPatch($number): string
     return blank($number) ? '0' : (preg_replace('/[^0-9.-]/', '', (string) $number) ?? '0');
 }
 
-function arrayToObject($value)
+function datatableSubItemHeaders($subItems): array
 {
-    if (is_array($value)) {
-        return (object) array_map('arrayToObject', $value);
-    }
-
-    return $value;
+    return array_keys((array) $subItems[0]);
 }

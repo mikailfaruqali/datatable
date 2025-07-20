@@ -4,6 +4,7 @@ namespace DummyNamespace;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Snawbar\DataTable\Components\DataTable;
 
 class DummyClass extends DataTable
@@ -87,7 +88,7 @@ class DummyClass extends DataTable
         return NULL;
     }
 
-    public function extendRowResponse(object $row): ?array
+    public function attachPrintSubitems(object $row): ?Collection
     {
         return NULL;
     }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ session()->get(config('snawbar-datatable.local-direction-session-key', 'direction'), 'rtl') }}">
+<html lang="{{ app()->getLocale() }}"
+    dir="{{ session()->get(config('snawbar-datatable.local-direction-session-key', 'direction'), 'rtl') }}">
 
 <head>
     <meta charset="UTF-8">
@@ -65,6 +66,20 @@
             font-size: 1.1em;
             font-weight: bolder;
         }
+
+        .subtable {
+            width: 100%;
+            vertical-align: top;
+            border-collapse: collapse;
+        }
+
+        .subtable>thead {
+            vertical-align: bottom;
+        }
+
+        .subtable>tbody>tr>td {
+            border-top: 1px dotted black;
+        }
     </style>
 </head>
 
@@ -76,17 +91,43 @@
         <thead class="thead-dark">
             <tr>
                 @foreach ($headers as $header)
-                    <th>{{ datatablePrintHtml($header) }}</th>
+                    <th>{{ $header }}</th>
                 @endforeach
             </tr>
         </thead>
         <tbody>
             @foreach ($rows as $row)
                 <tr>
-                    @foreach ($row as $cell)
-                        <td>{{ strip_tags($cell) }}</td>
+                    @foreach ($row as $key => $cell)
+                        @continue($key === 'subItems')
+                        <td>{{ $cell }}</td>
                     @endforeach
                 </tr>
+
+                @if (isset($row->subItems))
+                    <tr>
+                        <td colspan="100%">
+                            <table class="subtable">
+                                <thead>
+                                    <tr>
+                                        @foreach (datatableSubItemHeaders($row->subItems) as $key)
+                                            <th>{{ $key }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($row->subItems as $subItem)
+                                        <tr>
+                                            @foreach ($subItem as $value)
+                                                <td>{{ $value }}</td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                @endif
             @endforeach
         </tbody>
         <tfoot>

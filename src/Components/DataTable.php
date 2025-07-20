@@ -117,7 +117,7 @@ abstract class DataTable
         return NULL;
     }
 
-    public function extendRowResponse(object $row): ?array
+    public function attachPrintSubitems(object $row): ?Collection
     {
         return NULL;
     }
@@ -269,6 +269,10 @@ abstract class DataTable
                 $row->iteration = $start + $index + 1;
             }
 
+            if ($this->request->has('print') && $subItems = $this->attachPrintSubitems($row)) {
+                $row->subItems = collect($subItems);
+            }
+
             foreach ($this->addColumns as $name => $callback) {
                 $row->{$name} = $callback($row);
             }
@@ -278,8 +282,6 @@ abstract class DataTable
                     $row->{$name} = $callback($row);
                 }
             }
-
-            collect($this->extendRowResponse($row))->each(fn ($value, $key) => $row->{$key} = arrayToObject($value));
         });
 
         return $rows;
