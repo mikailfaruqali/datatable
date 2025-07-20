@@ -2,6 +2,7 @@
 
 namespace Snawbar\DataTable\Services;
 
+use Closure;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,7 @@ class Total
     public static function make($column): self
     {
         return tap(new static, function ($instance) use ($column) {
-            $instance->attributes += is_array($column) ? $column : ['column' => $column, 'alias' => $column];
+            $instance->attributes += is_array($column) ? $column : ['column' => $column, 'alias' => $column, 'query' => NULL];
         });
     }
 
@@ -88,13 +89,34 @@ class Total
         return $this->attributes['visible'] ?? TRUE;
     }
 
-    public function rawExpression(): Expression
+    public function getRawExpression(): ?Expression
     {
-        return DB::raw(sprintf('SUM(%s) as %s', $this->getColumn(), $this->getAlias()));
+        return $this->rawExpression();
+    }
+
+    public function query($query): self
+    {
+        $this->attributes['query'] = $query;
+
+        return $this;
+    }
+
+    public function getQuery(): ?Closure
+    {
+        return $this->attributes['query'];
     }
 
     public function toArray(): array
     {
         return $this->attributes;
+    }
+
+    private function rawExpression(): ?Expression
+    {
+        if (filled($this->attributes['query'])) {
+            return NULL;
+        }
+
+        return DB::raw(sprintf('SUM(%s) as %s', $this->getColumn(), $this->getAlias()));
     }
 }

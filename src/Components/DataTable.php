@@ -280,34 +280,25 @@ abstract class DataTable
 
     private function prepareAggregateQuery(): array
     {
-        $totalableColumns = $this->processTotalableColumns;
+        $columns = $this->processTotalableColumns;
 
-        $aggregateQuery = DB::query()
+        $rawQuery = DB::query()
             ->fromSub($this->builder, 'totals')
             ->selectRaw('COUNT(*) as total_records')
-            ->when($this->isTotalable(), function ($query) use ($totalableColumns) {
-                $query->addSelect($totalableColumns->pluck('raw')->all());
-            })
+            ->when($this->isTotalable(), fn ($q) => $q->addSelect($columns->whereNotNull('raw')->pluck('raw')->all()))
             ->first();
 
-        $totalRecords = $aggregateQuery->total_records;
+        $totalableResults = $this->isTotalable() ? $columns->mapWithKeys(fn ($column) => [
+            $column->alias => [
+                'title' => $column->title,
+                'value' => ($column->resolve)($column->query ? ($column->query)() : $rawQuery->{$column->alias}),
+            ],
+        ]) : [];
 
-        unset($aggregateQuery->total_records);
-
-        $aggregateQuery = collect($aggregateQuery)
-            ->mapWithKeys(function ($value, $alias) use ($totalableColumns) {
-                $column = $totalableColumns->firstWhere('alias', $alias);
-
-                return [
-                    $alias => [
-                        'title' => $column->title,
-                        'value' => ($column->resolve)($value),
-                    ],
-                ];
-            })
-            ->all();
-
-        return [$totalRecords, $aggregateQuery];
+        return [
+            $rawQuery->total_records,
+            $totalableResults,
+        ];
     }
 
     private function processTotalableColumns(): Collection
@@ -318,7 +309,8 @@ abstract class DataTable
             ->map(fn ($totalableColumn) => (object) [
                 'title' => $totalableColumn->getTitle(),
                 'alias' => $totalableColumn->getAlias(),
-                'raw' => $totalableColumn->rawExpression(),
+                'raw' => $totalableColumn->getRawExpression(),
+                'query' => $totalableColumn->getQuery(),
                 'resolve' => fn ($value) => $totalableColumn->getFormatter() ? $totalableColumn->getFormatter()($value) : $value,
             ]);
     }

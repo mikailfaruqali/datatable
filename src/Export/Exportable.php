@@ -106,7 +106,7 @@ class Exportable implements FromArray, ShouldAutoSize, WithColumnFormatting, Wit
         $afterSheet->sheet->mergeCells($titleRange);
         $afterSheet->sheet->setCellValue('A1', $this->title);
         $afterSheet->sheet->getStyle($titleRange)->applyFromArray([
-            'font' => ['bold' => TRUE, 'size' => 16],
+            'font' => ['bold' => TRUE, 'size' => 18],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFDCE6F1']],
         ]);
@@ -136,9 +136,9 @@ class Exportable implements FromArray, ShouldAutoSize, WithColumnFormatting, Wit
             $worksheet->setCellValue($valueCell, $value);
 
             $styleArray = [
-                'font' => ['bold' => TRUE],
+                'font' => ['bold' => TRUE, 'size' => 16],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFF2F2F2']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'e0b887']],
             ];
 
             $worksheet->getStyle($labelCell)->applyFromArray($styleArray);
