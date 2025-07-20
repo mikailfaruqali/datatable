@@ -86,4 +86,9 @@ class DummyClass extends DataTable
     {
         return NULL;
     }
+
+    public function extendRowResponse(object $row): ?array
+    {
+        return NULL;
+    }
 }

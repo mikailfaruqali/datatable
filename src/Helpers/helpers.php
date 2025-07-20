@@ -37,3 +37,12 @@ function datatableNumberPatch($number): string
 {
     return blank($number) ? '0' : (preg_replace('/[^0-9.-]/', '', (string) $number) ?? '0');
 }
+
+function arrayToObject($value)
+{
+    if (is_array($value)) {
+        return (object) array_map('arrayToObject', $value);
+    }
+
+    return $value;
+}

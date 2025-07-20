@@ -117,6 +117,11 @@ abstract class DataTable
         return NULL;
     }
 
+    public function extendRowResponse(object $row): ?array
+    {
+        return NULL;
+    }
+
     public function setAttributes(array $attributes): self
     {
         $this->attributes = new Fluent($attributes);
@@ -273,6 +278,8 @@ abstract class DataTable
                     $row->{$name} = $callback($row);
                 }
             }
+
+            collect($this->extendRowResponse($row))->each(fn ($value, $key) => $row->{$key} = arrayToObject($value));
         });
 
         return $rows;
@@ -350,8 +357,7 @@ abstract class DataTable
 
     private function buildSortClause(): string
     {
-        $columnIndex = $this->request->input('order.0.column', $this->request->input('sortable'));
-        $columnName = $this->extractSortColumn($this->request->columns, $this->request->column, $columnIndex);
+        $columnName = $this->extractSortColumn();
         $direction = mb_strtoupper($this->request->input('order.0.dir', $this->request->dir));
 
         if ($this->shouldUseDefaultSort($columnName, $direction)) {
@@ -361,20 +367,26 @@ abstract class DataTable
         return sprintf('%s %s', $columnName, $direction);
     }
 
-    private function extractSortColumn($indexedColumns, $fallbackColumns, $index): ?string
+    private function extractSortColumn(): ?string
     {
-        if ($indexedColumns) {
-            return $indexedColumns[$index]['data'] ?? NULL;
+        $columnIndex = $this->request->input('order.0.column');
+        $columnName = $this->request->input('sortable');
+        $columns = $this->request->columns;
+
+        if (is_string($columns)) {
+            $columns = explode(',', $columns);
         }
 
-        $fallback = explode(',', (string) $fallbackColumns);
+        if (filled($columnIndex)) {
+            return $columns[$columnIndex] ?? NULL;
+        }
 
-        return in_array($index, $fallback) ? $index : NULL;
+        return in_array($columnName, $columns) ? $columnName : NULL;
     }
 
-    private function shouldUseDefaultSort($column, $direction): bool
+    private function shouldUseDefaultSort($columnName, $direction): bool
     {
-        return blank($column) || ! in_array($direction, ['ASC', 'DESC']) || $column === 'iteration';
+        return blank($columnName) || ! in_array($direction, ['ASC', 'DESC']) || $columnName === 'iteration';
     }
 
     private function callbackJs(): ?string
