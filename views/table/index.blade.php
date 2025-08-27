@@ -73,7 +73,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function {{ $tableRedrawFunction }} {
-    $('#{{ $tableId }}').DataTable().draw();
+    clearTimeout(window.{{ $jsSafeTableId }}_timer);
+    window.{{ $jsSafeTableId }}_timer = setTimeout(() => {
+        $('#{{ $tableId }}').DataTable().draw();
+    }, 300);
 }
 
 function {{ $jsSafeTableId }}_createAnchorElement(attributes = {}) {
