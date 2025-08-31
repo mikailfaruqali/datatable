@@ -380,7 +380,7 @@ abstract class DataTable
         }
 
         if (filled($columnIndex)) {
-            return $columns[$columnIndex] ?? NULL;
+            return $columns[$columnIndex]['data'] ?? NULL;
         }
 
         return in_array($columnName, $columns) ? $columnName : NULL;
