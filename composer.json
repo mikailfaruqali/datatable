@@ -1,6 +1,6 @@
 {
     "name": "mikailfaruqali/datatable",
-    "description": "A Laravel package to build server-side DataTable with custom column builders and easy frontend integration.",
+    "description": "A powerful Laravel package for building server-side DataTables with custom column builders, easy frontend integration, and comprehensive export functionality.",
     "keywords": [
         "laravel",
         "datatable",
