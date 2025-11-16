@@ -43,7 +43,7 @@ class Column
         return $this;
     }
 
-    public function getOrderable(): string
+    public function getOrderable(): bool
     {
         return $this->attributes['orderable'] ?? TRUE;
     }
@@ -55,7 +55,7 @@ class Column
         return $this;
     }
 
-    public function getExportable(): string
+    public function getExportable(): bool
     {
         return $this->attributes['exportable'] ?? TRUE;
     }
@@ -98,7 +98,7 @@ class Column
 
     public function type(string $type): self
     {
-        throw_unless(in_array($type, static::ALLOWED_TYPES), new InvalidArgumentException(sprintf('Invalid column type: %s', $type)));
+        throw_unless(in_array($type, static::ALLOWED_TYPES), InvalidArgumentException::class, sprintf('Invalid column type: %s', $type));
 
         $this->attributes['type'] = $type;
 

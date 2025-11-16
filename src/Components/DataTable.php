@@ -32,6 +32,8 @@ abstract class DataTable
 
     private array $hiddenColumns = [];
 
+    private int $totalRecords = 0;
+
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -241,6 +243,19 @@ abstract class DataTable
         return str_replace('-', '_', $this->tableId());
     }
 
+    public function totalRecords(int|Builder $totalRecords): self
+    {
+        if ($this->request->hasAny(['print', 'excel'])) {
+            return $this;
+        }
+
+        $this->totalRecords = $totalRecords instanceof Builder
+            ? $totalRecords->getCountForPagination()
+            : $totalRecords;
+
+        return $this;
+    }
+
     private function processColumnInstance(): Collection
     {
         return collect($this->columns())->map(fn ($column) => $column instanceof Column ? $column : Column::make($column));
@@ -250,6 +265,7 @@ abstract class DataTable
     {
         return DB::table('datatable_columns')
             ->where('datatable', $this->jsSafeTableId())
+            ->where('user_id', auth()->id())
             ->pluck('column')
             ->toArray();
     }
@@ -289,25 +305,49 @@ abstract class DataTable
 
     private function prepareAggregateQuery(): array
     {
-        $columns = $this->processTotalableColumns;
+        if (! $this->builder instanceof Builder) {
+            return [$this->totalRecords, []];
+        }
+
+        if ($this->totalRecords > 0) {
+            return [
+                $this->totalRecords,
+                $this->isTotalable() ? $this->computeTotals() : [],
+            ];
+        }
 
         $rawQuery = DB::query()
             ->fromSub($this->builder, 'totals')
             ->selectRaw('COUNT(*) as total_records')
-            ->when($this->isTotalable(), fn ($q) => $q->addSelect($columns->whereNotNull('raw')->pluck('raw')->all()))
+            ->when($this->isTotalable(), function ($query) {
+                $query->addSelect($this->processTotalableColumns->whereNotNull('raw')->pluck('raw')->all());
+            })
             ->first();
 
-        $totalableResults = $this->isTotalable() ? $columns->mapWithKeys(fn ($column) => [
+        return [
+            $rawQuery->total_records,
+            $this->isTotalable() ? $this->computeColumnTotals($rawQuery) : [],
+        ];
+    }
+
+    private function computeTotals(): array
+    {
+        $rawQuery = DB::query()
+            ->fromSub(clone $this->builder, 'totals')
+            ->select($this->processTotalableColumns->whereNotNull('raw')->pluck('raw')->all())
+            ->first();
+
+        return $this->computeColumnTotals($rawQuery);
+    }
+
+    private function computeColumnTotals($rawQuery): array
+    {
+        return $this->processTotalableColumns->mapWithKeys(fn ($column) => [
             $column->alias => [
                 'title' => $column->title,
                 'value' => ($column->resolve)($column->query ? ($column->query)() : $rawQuery->{$column->alias}),
             ],
-        ]) : [];
-
-        return [
-            $rawQuery->total_records,
-            $totalableResults,
-        ];
+        ])->all();
     }
 
     private function processTotalableColumns(): Collection
@@ -391,7 +431,7 @@ abstract class DataTable
         return blank($columnName) || ! in_array($direction, ['ASC', 'DESC']) || $columnName === 'iteration';
     }
 
-    private function callbackJs(): ?string
+    private function callbackJs(): string
     {
         $callbacks = $this->callbacks() ?: [];
 

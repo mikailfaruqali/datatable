@@ -45,7 +45,7 @@ class Process
             return $datatable->ajax();
         }
 
-        throw_if(blank($datatable->exportTitle()), new Exception('Export title is not set for the datatable'));
+        throw_if(blank($datatable->exportTitle()), Exception::class, 'Export title is not set for the datatable');
 
         if ($this->request->has('print')) {
             return $this->handlePrintPage($datatable);
